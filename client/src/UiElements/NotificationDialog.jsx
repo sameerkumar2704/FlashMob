@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Toaster } from "@/components/ui/toaster";
 import { useUserContext } from "@/context/usercontex";
 import { useToast } from "@/hooks/use-toast";
+import { asyncHandler } from "@/util/asynHandler";
 import { createContext, useContext, useRef, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { MdCancel } from "react-icons/md";
@@ -70,44 +71,37 @@ const RegistaionForm = () => {
         <Input ref={phonenumber} type='number' placeholder='User Name' />
       </form>
       <Button
-        onClick={async () => {
+        onClick={asyncHandler(async () => {
           const obj = {
             username: userName.current.value,
             password: password.current.value,
             email: email.current.value,
             phonenumber: phonenumber.current.value,
           };
-          try {
-            const res = await fetch("http://localhost:8080/users/register", {
-              method: "POST",
-              body: JSON.stringify(obj),
-              headers: { "Content-Type": "application/json" },
-            });
-            const result = await res.json();
-            if (result.status === "failed") throw new Error(result.message);
-            const loginUser = await fetch("http://localhost:8080/users/login", {
-              method: "POST",
-              body: JSON.stringify(obj),
-              headers: { "Content-Type": "application/json" },
-              credentials: "include",
-            });
 
-            const userDetial = await loginUser.json();
-            if (userDetial.status === "failed") throw new Error(result.message);
-            setCurrentUser((curr) => JSON.parse(userDetial.userDetail));
-            toast({
-              duration: 1000,
-              description: "Sign Up complete.",
-            });
-          } catch (error) {
-            toast({
-              duration: 1000,
-              variant: "destructive",
-              title: "Error ",
-              description: error.message,
-            });
-          }
-        }}
+          const res = await fetch("http://localhost:8080/users/register", {
+            method: "POST",
+            body: JSON.stringify(obj),
+            headers: { "Content-Type": "application/json" },
+          });
+          const result = await res.json();
+          console.log(result);
+          if (result.status === "failed") throw new Error(result.message);
+          const loginUser = await fetch("http://localhost:8080/users/login", {
+            method: "POST",
+            body: JSON.stringify(obj),
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+          });
+
+          const userDetial = await loginUser.json();
+          if (userDetial.status === "failed") throw new Error(result.message);
+          setCurrentUser(JSON.parse(userDetial.userDetail));
+          toast({
+            duration: 1000,
+            description: "Sign Up complete.",
+          });
+        }, toast)}
         className={` mt-10 py-2  w-full hover:bg-red-500/90 
           ${isOutline ? "border border-red-500" : "bg-red-500"}`}
       >

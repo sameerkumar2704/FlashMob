@@ -1,30 +1,20 @@
 import { User } from "../models/user.model.js";
+import { ApiError, asyncHandler } from "../util/aysncHandler.js";
 
-const registerUser = async (req, res) => {
+const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password, phonenumber } = req.body;
 
   if (
     [email, username, password, phonenumber].some(
       (field) => field?.trim() === ""
     )
-  ) {
-    res.status(400).json({
-      status: "failed",
-      message: "All Fields Are required.",
-    });
-    return;
-  }
+  )
+    throw new ApiError("All Fields Are required.", 400);
 
   const UserExist = await User.findOne({
     $or: [{ email }, { phonenumber }],
   });
-  if (UserExist) {
-    res.status(409).json({
-      status: "failed",
-      message: "Email or Phone is already in use .",
-    });
-    return;
-  }
+  if (UserExist) throw new ApiError("Email or Phone is already in use .", 409);
 
   let currUser = await User.create({
     username,
@@ -37,15 +27,12 @@ const registerUser = async (req, res) => {
   res.status(200).json({
     status: "success",
   });
-};
+});
 
-const loginUser = async (req, res, next) => {
+const loginUser = asyncHandler(async (req, res, next) => {
   const { phonenumber, password, email } = req.body;
   const user = await User.findOne({ $or: [{ phonenumber }, { email }] });
-  if (!user) {
-    res.json({ status: "failed", message: "user not found" });
-    return;
-  }
+  if (!user) throw new ApiError("user not found", 404);
 
   const isValidPassword = await user.isPaswordCorrect(password);
   if (!isValidPassword) throw new ApiError(404, "Wrong Password");
@@ -64,9 +51,9 @@ const loginUser = async (req, res, next) => {
       status: "success",
       userDetail: JSON.stringify(user),
     });
-};
+});
 
-const getCurrentUser = async (req, res, next) => {
+const getCurrentUser = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user._id).select(
     "-password -createdAt -updatedAt"
   );
@@ -74,5 +61,5 @@ const getCurrentUser = async (req, res, next) => {
     status: "sucess",
     detail: JSON.stringify(user),
   });
-};
+});
 export { registerUser, loginUser, getCurrentUser };
