@@ -1,26 +1,47 @@
+import { useToast } from "@/hooks/use-toast";
+
+import { getDetails } from "@/util/fetchHandlers";
 import { createContext, useContext, useEffect, useState } from "react";
+import { useGlobalContext } from "./globaleContext";
 
 const userContex = createContext();
 
 export function UserProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(undefined);
   const [verfiying, setVerifiyingStatus] = useState(true);
+  const { setIsLoading } = useGlobalContext();
+  const { toast } = useToast();
   useEffect(() => {
     async function verifyUser() {
-      const res = await fetch("http://localhost:8080/users/currentUser", {
-        headers: {
-          "Content-Type": "application/json", // Set content type if necessary
-        },
-        credentials: "include",
-      });
-      const userDetail = await res.json();
-      if (userDetail.status != "failed")
-        setCurrentUser(JSON.parse(userDetail.detail));
-      setVerifiyingStatus(false);
-      return userDetail;
+      setIsLoading(true);
+      try {
+        const userDetail = await getDetails("/api/users/currentUser");
+
+        if (userDetail.status != "failed") {
+          setCurrentUser(JSON.parse(userDetail.detail));
+        } else {
+          throw new Error(userDetail.message);
+        }
+
+        return userDetail;
+      } catch (err) {
+        if (err.message !== "Access Token not Found") {
+          toast({
+            duration: 1000,
+            variant: "destructive",
+            title: "Error ",
+            description: err.message,
+          });
+        }
+      } finally {
+        setIsLoading(false);
+
+        setVerifiyingStatus(false);
+      }
     }
     verifyUser();
   }, []);
+  console.log(currentUser);
   return (
     <userContex.Provider value={{ currentUser, setCurrentUser, verfiying }}>
       {children}
