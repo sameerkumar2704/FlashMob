@@ -1,17 +1,23 @@
+import { useEffect, useState } from "react";
 import "./App.css";
 import { Toaster } from "./components/ui/toaster";
 import { useUserContext } from "./context/usercontex";
 import { NavBar } from "./UiElements/NavBar";
 import { NotificationBox } from "./UiElements/NotificationDialog";
+import { useGlobalContext } from "./context/globaleContext";
 function App() {
   const { currentUser, verfiying } = useUserContext();
-  console.log(!currentUser);
+  const { setShow } = useGlobalContext();
+  useEffect(() => {
+    setShow(!currentUser);
+  }, [currentUser, setShow]);
+
   return (
     <>
       <NavBar />
       {!verfiying && (
         <>
-          <NotificationBox isOpen={!currentUser} title='Registration'>
+          <NotificationBox title='Registration'>
             <NotificationBox.Registration />
             <NotificationBox.Login />
           </NotificationBox>

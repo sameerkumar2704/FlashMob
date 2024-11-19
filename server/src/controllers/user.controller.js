@@ -1,6 +1,6 @@
 import { User } from "../models/user.model.js";
 import { ApiError, asyncHandler } from "../util/aysncHandler.js";
-
+import jwt from "jsonwebtoken";
 const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password, phonenumber } = req.body;
 
@@ -49,7 +49,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
     .cookie("accessToken", accesToken, option)
     .json({
       status: "success",
-      userDetail: JSON.stringify(user),
+      detail: JSON.stringify(user),
     });
 });
 
@@ -62,4 +62,66 @@ const getCurrentUser = asyncHandler(async (req, res, next) => {
     detail: JSON.stringify(user),
   });
 });
-export { registerUser, loginUser, getCurrentUser };
+const logoutUser = asyncHandler(async (req, res) => {
+  // get access Token and find user from access token
+  // set new access Token and refreshToken
+  // remove Cookies from user
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: { refreshToken: "" },
+    },
+    { new: true }
+  );
+  const option = {
+    httpOnly: true,
+  };
+  res
+    .status(200)
+    .clearCookie("refreshToken", option)
+    .clearCookie("accessToken", option)
+    .json({
+      status: "sucess",
+      detail: JSON.stringify(user),
+    });
+});
+const refreshAcessToken = asyncHandler(async (req, res) => {
+  const refreshAccessToken = req.cookies?.refreshToken;
+  console.log(refreshAccessToken);
+  if (!refreshAccessToken) throw new ApiError("Access Token not Found", 404);
+  let decodeToken = undefined;
+  try {
+    decodeToken = jwt.verify(
+      refreshAccessToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
+  } catch (e) {
+    throw new ApiError(404, e.message);
+  }
+
+  const user_obj = await User.findById(decodeToken._id);
+  if (!user_obj) throw new ApiError(404, "User not found");
+  const accesToken = await user_obj.generateAccessToken();
+  const refreshToken = await user_obj.generateRefreshToken();
+  user_obj.refreshToken = refreshToken;
+
+  await user_obj.save({ validateBeforeSave: false });
+  const option = {
+    httpOnly: true,
+  };
+  res
+    .cookie("refreshToken", refreshToken, option)
+    .cookie("accessToken", accesToken, option)
+    .json({
+      status: "success",
+      detail: JSON.stringify(user_obj),
+    });
+});
+export {
+  registerUser,
+  loginUser,
+  getCurrentUser,
+  logoutUser,
+  refreshAcessToken,
+};

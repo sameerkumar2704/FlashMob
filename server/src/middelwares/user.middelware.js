@@ -7,7 +7,15 @@ const verifyToken = asyncHandler(async (req, res, next) => {
     req.cookies?.accessToken ||
     req.header("Authorization")?.replace("Bearer", "");
   if (!acessToken) throw new ApiError("Access Token not Found", 404);
-  const decodeToken = jwt.verify(acessToken, process.env.ACCESS_TOKEN_SECRET);
+  let decodeToken;
+  try {
+    decodeToken = jwt.verify(acessToken, process.env.ACCESS_TOKEN_SECRET);
+  } catch (e) {
+    console.log(e.message);
+    throw new ApiError("Access Token not Found", 404);
+  }
+
+  if (!decodeToken) throw new ApiError("Access Token not Found", 404);
   const user = await User.findById(decodeToken._id);
   if (!user) throw new ApiError("User not found", 404);
   req.user = user;

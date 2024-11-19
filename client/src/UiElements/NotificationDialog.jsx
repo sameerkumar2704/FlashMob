@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Toaster } from "@/components/ui/toaster";
+import { useGlobalContext } from "@/context/globaleContext";
 import { useUserContext } from "@/context/usercontex";
 import { useToast } from "@/hooks/use-toast";
 import { asyncHandler } from "@/util/asynHandler";
-import { postDetails } from "@/util/fetchHandlers";
-import { createContext, useContext, useRef, useState } from "react";
+import { getDetails, postDetails } from "@/util/fetchHandlers";
+import { Flag } from "lucide-react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { MdCancel } from "react-icons/md";
 
@@ -15,22 +17,25 @@ const useNotificiationContext = () => {
   if (!data) throw new Error("Notification Context Not Found");
   return data;
 };
-const NotificationBox = ({ isOpen, title, children }) => {
-  const [show, setShow] = useState(isOpen);
-  const [animate, setAnimate] = useState(false);
+const NotificationBox = ({ title, children }) => {
   const [page, setPage] = useState(title);
+  const { setShow, show } = useGlobalContext();
+  const [animate, setAnimate] = useState(false);
+  useEffect(() => {
+    setAnimate(false);
+  }, [show]);
 
   if (!show) return;
 
   return (
     <context.Provider
-      value={{ isOpen, title, children, setAnimate, setShow, page, setPage }}
+      value={{ title, children, setAnimate, setShow, page, setPage }}
     >
       <div
         className={`  transition-all flex justify-center items-center fixed bg-black/40 z-10 left-0 right-0 bottom-0 top-0 duration-200`}
       >
         <div
-          className={` w-[30vw] max-lg:w-[60vw] max-sm:w-[90vw] bg-white duration-200 ${
+          className={` w-[30vw] max-lg:w-[60vw] max-sm:w-[90vw] bg-white duration-200 transition ${
             animate ? "animate-out" : "animate-in "
           }`}
         >
@@ -119,7 +124,6 @@ const RegistaionForm = () => {
             onClick={() => setPage("Log In")}
             className=' text-gray-600 mx-4'
           >
-            {" "}
             sign in
           </button>
         </h1>
@@ -154,9 +158,10 @@ const LoginInForm = () => {
             email: email.current.value,
           };
 
-          const userDetial = await postDetails("/api/users/login", obj);
+          let userDetial = await postDetails("/api/users/login", obj);
           if (userDetial.status === "failed")
             throw new Error(userDetial.message);
+
           setAnimate(true);
           setTimeout(() => {
             setCurrentUser(JSON.parse(userDetial.userDetail));

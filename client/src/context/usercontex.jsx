@@ -15,12 +15,17 @@ export function UserProvider({ children }) {
     async function verifyUser() {
       setIsLoading(true);
       try {
-        const userDetail = await getDetails("/api/users/currentUser");
+        let userDetail = await getDetails("/api/users/currentUser");
 
         if (userDetail.status != "failed") {
           setCurrentUser(JSON.parse(userDetail.detail));
         } else {
-          throw new Error(userDetail.message);
+          userDetail = await getDetails("/api/users/refreshToken");
+          if (userDetail.status === "failed") {
+            throw new Error(userDetail.message);
+          } else {
+            setCurrentUser(JSON.parse(userDetail.detail));
+          }
         }
 
         return userDetail;
