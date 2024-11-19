@@ -1,12 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Toaster } from "@/components/ui/toaster";
 import { useGlobalContext } from "@/context/globaleContext";
 import { useUserContext } from "@/context/usercontex";
 import { useToast } from "@/hooks/use-toast";
 import { asyncHandler } from "@/util/asynHandler";
-import { getDetails, postDetails } from "@/util/fetchHandlers";
-import { Flag } from "lucide-react";
+import { postDetails } from "@/util/fetchHandlers";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { MdCancel } from "react-icons/md";
@@ -93,12 +91,12 @@ const RegistaionForm = () => {
           const result = await postDetails("/api/users/register", obj);
           if (result.status === "failed") throw new Error(result.message);
 
-          const userDetial = await postDetails("/api/users/login", obj);
+          const userDetail = await postDetails("/api/users/login", obj);
 
-          if (userDetial.status === "failed") throw new Error(result.message);
+          if (userDetail.status === "failed") throw new Error(result.message);
           setAnimate(true);
           setTimeout(() => {
-            setCurrentUser(JSON.parse(userDetial.userDetail));
+            setCurrentUser(JSON.parse(userDetail.detail));
             setShow(false);
           }, 200);
           toast({
@@ -158,13 +156,13 @@ const LoginInForm = () => {
             email: email.current.value,
           };
 
-          let userDetial = await postDetails("/api/users/login", obj);
-          if (userDetial.status === "failed")
-            throw new Error(userDetial.message);
+          let userDetail = await postDetails("/api/users/login", obj);
+          if (userDetail.status === "failed")
+            throw new Error(userDetail.message);
 
           setAnimate(true);
           setTimeout(() => {
-            setCurrentUser(JSON.parse(userDetial.userDetail));
+            setCurrentUser(JSON.parse(userDetail.detail));
             setShow(false);
           }, 200);
           toast({
