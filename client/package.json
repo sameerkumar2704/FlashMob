@@ -18,8 +18,12 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.3.0",
+<<<<<<< HEAD
     "react-router-dom": "^6.28.0",
     "react-simple-star-rating": "^5.1.7",
+=======
+    "styled-components": "^6.1.13",
+>>>>>>> 3a9a951db4baa4ec46dfb9c95416953c98ede861
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7"
   },
