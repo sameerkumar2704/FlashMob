@@ -2,23 +2,33 @@ import { GoHeart } from "react-icons/go";
 import MenuItem from "./MenuItem";
 import { PiShoppingCartLight } from "react-icons/pi";
 import { Input } from "@/components/ui/input";
-import { useUserContext } from "@/context/usercontex";
 import { Button } from "@/components/ui/button";
-import { useGlobalContext } from "@/context/globaleContext";
 import { RxHamburgerMenu } from "react-icons/rx";
-import { useNavDrawer } from "@/context/navDrawerContext";
 import { NavDrawer } from "./NavDrawer";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  currentUserInstance,
+  navigationDrawerStateUpdate,
+  setStateOfDialogBox,
+} from "@/redux/slice";
+
 export function NavBar() {
-  const { currentUser, setCurrentUser } = useUserContext();
-  const { setShow } = useGlobalContext();
-  const { setDrawerStatus } = useNavDrawer();
+  const { currentUser, navigationDrawerState } = useSelector(
+    (state) => state.global
+  );
+  const dispatch = useDispatch();
+  console.log(!currentUser);
   return (
     <header>
       <nav className=' relative flex justify-between px-6 items-center py-2 gap-10 max-sm:gap-3'>
         <RxHamburgerMenu
           onClick={(e) => {
             e.stopPropagation();
-            setDrawerStatus((curr) => (curr === "open" ? "close" : "open"));
+            dispatch(
+              navigationDrawerStateUpdate(
+                navigationDrawerState === "open" ? "close" : "open"
+              )
+            );
           }}
           className=' max-sm:block hidden'
         />
@@ -39,27 +49,29 @@ export function NavBar() {
               icon={<PiShoppingCartLight className='w-full h-full' />}
             />
           </li>
-          {currentUser && (
+          {currentUser !== undefined && (
             <li className='  flex gap-2'>
               <div className=' p-1 border border-red-100  rounded-full  h-8 w-8'>
-                <div className=' font-semibold  flex justify-center items-center rounded-full w-full h-full bg-red-100'>
-                  {currentUser.username.charAt(0)}
-                </div>
+                <div className=' font-semibold  flex justify-center items-center rounded-full w-full h-full bg-red-100'></div>
               </div>
               <Button
                 variant='primary'
                 onClick={async () => {
-                  const res = await fetch("/api/users/logout");
-                  setCurrentUser(undefined);
+                  await fetch("/api/users/logout");
+                  dispatch(currentUserInstance(undefined));
+                  dispatch(setStateOfDialogBox(true));
                 }}
               >
                 Log out
               </Button>
             </li>
           )}
-          {!currentUser && (
+          {currentUser === undefined && (
             <li>
-              <Button variant='primary' onClick={() => setShow(true)}>
+              <Button
+                variant='primary'
+                onClick={() => dispatch(setStateOfDialogBox(true))}
+              >
                 Sing up
               </Button>
             </li>

@@ -2,6 +2,7 @@ import express from "express";
 import { userRoute } from "./routes/user.routes.js";
 import cookieParser from "cookie-parser";
 import { errorController } from "./controllers/error.controller.js";
+import { productRoute } from "./routes/product.routes.js";
 const app = express();
 app.use("/", (_, res, next) => {
   res.header("Access-Control-Allow-Origin", "http://localhost:5173"); // Replace with your frontend URL
@@ -16,5 +17,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(errorController);
 app.use("/users", userRoute);
+app.use("/product", productRoute);
 
 export { app };

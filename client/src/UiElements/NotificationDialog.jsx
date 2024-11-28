@@ -1,13 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useGlobalContext } from "@/context/globaleContext";
-import { useUserContext } from "@/context/usercontex";
+
 import { useToast } from "@/hooks/use-toast";
+import {
+  currentUserInstance,
+  setStateOfDialogBox,
+  setToastMessage,
+} from "@/redux/slice";
 import { asyncHandler } from "@/util/asynHandler";
 import { postDetails } from "@/util/fetchHandlers";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { MdCancel } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
 
 const context = createContext(undefined);
 const useNotificiationContext = () => {
@@ -16,18 +21,26 @@ const useNotificiationContext = () => {
   return data;
 };
 const NotificationBox = ({ title, children }) => {
+  const { showDialogBox } = useSelector((state) => state.global);
+  const dispatch = useDispatch();
   const [page, setPage] = useState(title);
-  const { setShow, show } = useGlobalContext();
   const [animate, setAnimate] = useState(false);
+  console.log("dialog" + showDialogBox);
   useEffect(() => {
     setAnimate(false);
-  }, [show]);
+  }, [showDialogBox]);
 
-  if (!show) return;
+  if (!showDialogBox) return;
 
   return (
     <context.Provider
-      value={{ title, children, setAnimate, setShow, page, setPage }}
+      value={{
+        title,
+        children,
+        setAnimate,
+        page,
+        setPage,
+      }}
     >
       <div
         className={`  transition-all flex justify-center items-center fixed bg-black/40 z-10 left-0 right-0 bottom-0 top-0 duration-200`}
@@ -41,7 +54,7 @@ const NotificationBox = ({ title, children }) => {
             <MdCancel
               onClick={() => {
                 setAnimate(true);
-                setTimeout(() => setShow(false), 200);
+                setTimeout(() => dispatch(setStateOfDialogBox(false)), 200);
               }}
               className=' w-6 h-6  mr-auto'
             />
@@ -57,9 +70,8 @@ const NotificationBox = ({ title, children }) => {
   );
 };
 const RegistaionForm = () => {
-  const { setCurrentUser } = useUserContext();
-  const { isOutline, setAnimate, setShow, page, setPage } =
-    useNotificiationContext();
+  const dispatch = useDispatch();
+  const { isOutline, setAnimate, page, setPage } = useNotificiationContext();
   const userName = useRef();
   const email = useRef();
   const password = useRef();
@@ -96,13 +108,10 @@ const RegistaionForm = () => {
           if (userDetail.status === "failed") throw new Error(result.message);
           setAnimate(true);
           setTimeout(() => {
-            setCurrentUser(JSON.parse(userDetail.detail));
-            setShow(false);
+            dispatch(currentUserInstance(JSON.parse(userDetail.detail)));
+            dispatch(setStateOfDialogBox(false));
           }, 200);
-          toast({
-            duration: 1000,
-            description: "Sign Up complete.",
-          });
+          dispatch(setToastMessage("Login Completed"));
         }, toast)}
         className={` mt-10 py-2  w-full hover:bg-red-500/90 
           ${isOutline ? "border border-red-500" : "bg-red-500"}`}
@@ -130,9 +139,8 @@ const RegistaionForm = () => {
   );
 };
 const LoginInForm = () => {
-  const { setCurrentUser } = useUserContext();
-  const { isOutline, setAnimate, setShow, page, setPage } =
-    useNotificiationContext();
+  const dispatch = useDispatch();
+  const { isOutline, setAnimate, page, setPage } = useNotificiationContext();
 
   const email = useRef();
   const password = useRef();
@@ -162,13 +170,10 @@ const LoginInForm = () => {
 
           setAnimate(true);
           setTimeout(() => {
-            setCurrentUser(JSON.parse(userDetail.detail));
-            setShow(false);
+            dispatch(currentUserInstance(JSON.parse(userDetail.detail)));
+            dispatch(setStateOfDialogBox(false));
           }, 200);
-          toast({
-            duration: 1000,
-            description: "Sign Up complete.",
-          });
+          dispatch(setToastMessage("Login Completed"));
         }, toast)}
         className={` mt-10 py-2  w-full hover:bg-red-500/90 
           ${isOutline ? "border border-red-500" : "bg-red-500"}`}

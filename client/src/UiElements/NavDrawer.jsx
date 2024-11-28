@@ -1,23 +1,25 @@
-import { useNavDrawer } from "@/context/navDrawerContext";
-import { useUserContext } from "@/context/usercontex";
+import { navigationDrawerStateUpdate } from "@/redux/slice";
+
 import { useEffect, useState } from "react";
 import { GoHeart, GoSignOut } from "react-icons/go";
 import { PiShoppingCartLight } from "react-icons/pi";
+import { useDispatch, useSelector } from "react-redux";
 
 export function NavDrawer() {
-  const { currentUser } = useUserContext();
-  const { openDrawer, setDrawerStatus } = useNavDrawer();
+  const { currentUser, navigationDrawerState } = useSelector(
+    (state) => state.global
+  );
+  const dispatch = useDispatch();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   useEffect(() => {
-    if (windowWidth > 632) setDrawerStatus("close");
+    if (windowWidth > 632) dispatch(navigationDrawerStateUpdate("close"));
   }, [windowWidth]);
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
     const outterClick = () => {
-      setDrawerStatus("close");
-      console.log(openDrawer);
+      dispatch(navigationDrawerStateUpdate("close"));
     };
 
     window.addEventListener("resize", handleResize);
@@ -30,7 +32,7 @@ export function NavDrawer() {
   return (
     <div
       className={` border border-black/50 shadow-lg rounded-md overflow-hidden absolute z-20  top-full  ${
-        openDrawer === "open" ? "visible" : "invisible"
+        navigationDrawerState === "open" ? "visible" : "invisible"
       }`}
       onClick={() => {}}
     >
@@ -42,9 +44,7 @@ export function NavDrawer() {
       >
         <div className=' flex items-center gap-2 justify-start '>
           <div className=' p-1 border border-red-100  rounded-full  h-8 w-8'>
-            <div className=' font-semibold  flex justify-center items-center rounded-full w-full h-full bg-red-100'>
-              {currentUser?.username.charAt(0)}
-            </div>
+            <div className=' font-semibold  flex justify-center items-center rounded-full w-full h-full bg-red-100'></div>
           </div>
           <h1>{currentUser?.username}</h1>
         </div>
