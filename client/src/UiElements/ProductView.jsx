@@ -1,13 +1,19 @@
 import { useState } from "react";
 import { RatingComponents } from "./RatingComponent";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export function ProductView({ productDetails }) {
+  const navigator = useNavigate();
   const [showAddToCart, setAddToCart] = useState(false);
   // const [faviourate, setAsFaviourate] = useState(productDetails.faviourate);
   // const { setItemList } = useCartContext();
+  console.log(productDetails);
   return (
     <div
+      onClick={() =>
+        navigator(`product/${productDetails.title.split(" ").join("")}`)
+      }
       onMouseLeave={() => setAddToCart(false)}
       onMouseEnter={() => setAddToCart(true)}
       className=' text-sm space-y-1'

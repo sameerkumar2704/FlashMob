@@ -11,8 +11,9 @@ export function HorizontalView({ productList }) {
             <ProductView
               Key={product}
               productDetails={{
+                id: product._id,
                 img: product.images[0].url,
-                title: product.images[0].url,
+                title: product.name,
                 starCount: 1,
                 price: 200,
                 faviourate: true,
