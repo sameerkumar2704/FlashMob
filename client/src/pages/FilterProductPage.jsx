@@ -17,20 +17,29 @@ export function FilterProductPage() {
     const handleResize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-  
-      const rowHeight = 250; 
-      const rows = Math.floor(height / rowHeight);
-  
-      if (width >= 1024) setProductsPerPage(rows * 4); 
-      else if (width >= 768) setProductsPerPage(rows * 3); 
-      else setProductsPerPage(rows * 2); 
-      
+
+      const rowHeight = 300; 
+      const rows = Math.floor(height / rowHeight); 
+
+      if (width >= 1280) {
+        setProductsPerPage(rows * 4); 
+      }
+      else if(width >= 1027)
+      {
+        setProductsPerPage(rows * 3); 
+      }
+      else if (width >= 768) {
+        setProductsPerPage(rows * 2); 
+      } else if(width <= 645){
+        setProductsPerPage(10); 
+      }
+
       setCurrentPage(1);
     };
-  
+
     window.addEventListener("resize", handleResize);
-    handleResize();
-  
+    handleResize(); 
+
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
@@ -66,7 +75,7 @@ export function FilterProductPage() {
   };
   
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen">
       {isSidebarOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden" onClick={() => setIsSidebarOpen(false)}></div>
       )}
@@ -108,7 +117,7 @@ export function FilterProductPage() {
         ) : (
           <>
             {/* Product Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {displayedProducts.map((product) => (
                 <ProductView
                   key={product.id}
