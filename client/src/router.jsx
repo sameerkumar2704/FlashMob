@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { HomePage } from "./pages/HomePage";
 import { LandingPage } from "./pages/landingPage";
 import ProductDetails from "./pages/ProductDetails";
+import { FilterProductPage } from "./pages/FilterProductPage";
 
 export const router = createBrowserRouter([
   {
@@ -10,12 +11,16 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <HomePage />,
+        element: <HomePage />
       },
       {
         path: "product/:productId",
-        element: <ProductDetails />,
-      },
-    ],
+        element: <ProductDetails />
+      }
+    ]
   },
+  {
+    path: "filter-products",
+    element: <FilterProductPage />
+  }
 ]);
