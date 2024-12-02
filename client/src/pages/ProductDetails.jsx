@@ -19,9 +19,11 @@ function ProductOverviewImage() {
   );
 }
 function ColorSelector({ selectedColor, setSelectedColor, color }) {
-  console.log(selectedColor);
   return (
     <div
+      style={{
+        backgroundColor: color,
+      }}
       onClick={() => setSelectedColor(color)}
       className={` bg-[${color}-700] w-6 h-6 rounded-full border-2 ${
         color === selectedColor && "border-black"
@@ -29,19 +31,23 @@ function ColorSelector({ selectedColor, setSelectedColor, color }) {
     ></div>
   );
 }
-function SizeSelector({ selectedSize, setSelectedSize, color }) {
+function SizeSelector({ selectedSize, setSelectedSize, curr_size }) {
   return (
-    <div>
-      onClick={() => setSelectedSize(color)}
-      className=
-      {` bg-[${color}-700] w-6 h-6 rounded-full border-2 ${
-        color === selectedSize && "border-black"
-      }`}
+    <div
+      className={` text-sm  border  w-7 h-7  text-center ${
+        curr_size == selectedSize
+          ? "bg-red-500 text-white"
+          : "bg-white text-black"
+      } `}
+      onClick={() => setSelectedSize(curr_size)}
+    >
+      {curr_size}
     </div>
   );
 }
 function ProductDetails() {
   const [selectedColor, setSelectedColor] = useState();
+  const [selectedSize, setSelectedSize] = useState();
   return (
     <div className=' grid grid-cols-[60vw_auto] '>
       <ProductOverviewImage />
@@ -66,6 +72,19 @@ function ProductDetails() {
                 color={color}
                 selectedColor={selectedColor}
                 setSelectedColor={setSelectedColor}
+              />
+            ))}
+          </div>
+        </div>
+        <div className=' flex gap-2'>
+          <p>Size :</p>
+          <div className=' flex gap-1'>
+            {Array.from(["xl", "l"]).map((size) => (
+              <SizeSelector
+                key={size}
+                curr_size={size}
+                selectedSize={selectedSize}
+                setSelectedSize={setSelectedSize}
               />
             ))}
           </div>

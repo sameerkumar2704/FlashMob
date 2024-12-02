@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getDetails } from "@/util/fetchHandlers.jsx";
 
+// why using middleware in redux
 export const getAllProducts = createAsyncThunk(
   "global/allproducts",
   async (limit) => {
