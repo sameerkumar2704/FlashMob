@@ -77,7 +77,7 @@ export function FilterProductPage() {
         ></div>
       )}
       <div
-        className={`fixed top-0 left-0 h-full z-20 bg-white  px-4 py-6 transform ${
+        className={`fixed top-0 left-0 h-full z-20 bg-white   px-4 py-6 transform ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 md:static md:translate-x-0`}
       >
