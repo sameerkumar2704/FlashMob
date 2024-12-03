@@ -1,5 +1,7 @@
+import { Button } from "@/components/ui/button";
 import { RatingComponents } from "@/UiElements/RatingComponent";
 import { useState } from "react";
+import { GoHeart } from "react-icons/go";
 function ProductOverviewImage() {
   const [selected_image, seImage] = useState("blue");
   return (
@@ -48,6 +50,7 @@ function SizeSelector({ selectedSize, setSelectedSize, curr_size }) {
 function ProductDetails() {
   const [selectedColor, setSelectedColor] = useState();
   const [selectedSize, setSelectedSize] = useState();
+  const [quantity, setQuantity] = useState(0);
   return (
     <div className=' grid grid-cols-[60vw_auto] '>
       <ProductOverviewImage />
@@ -87,6 +90,17 @@ function ProductDetails() {
                 setSelectedSize={setSelectedSize}
               />
             ))}
+          </div>
+        </div>
+        <div className=' flex gap-2 items-center'>
+          <div className=' flex gap-3 border px-2 py-1 items-center w-fit'>
+            <Button className='bg-red-500 text-white'>+</Button>
+            <span>{quantity}</span>
+            <Button className='bg-red-500 text-white'>-</Button>
+          </div>
+          <Button>Buy</Button>
+          <div className=' p-2 border w-fit'>
+            <GoHeart />
           </div>
         </div>
       </div>
