@@ -11,16 +11,16 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <HomePage />
+        element: <HomePage />,
       },
       {
         path: "product/:productId",
-        element: <ProductDetails />
-      }
-    ]
+        element: <ProductDetails />,
+      },
+      {
+        path: "filter-products",
+        element: <FilterProductPage />,
+      },
+    ],
   },
-  {
-    path: "filter-products",
-    element: <FilterProductPage />
-  }
 ]);

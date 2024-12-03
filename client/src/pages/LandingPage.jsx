@@ -13,8 +13,11 @@ export function LandingPage() {
   }
   return (
     <>
-      <NavBar />
-      <Outlet />
+      <div className=' h-screen grid grid-rows-[8vh_92vh]'>
+        <NavBar />
+        <Outlet />
+      </div>
+
       {!verfiying && (
         <>
           <NotificationBox title='Registration'>

@@ -12,7 +12,7 @@ export function ProductView({ productDetails }) {
   return (
     <div
       onClick={() =>
-        navigator(`product/${productDetails.title.split(" ").join("")}`)
+        navigator(`/product/${productDetails.title.split(" ").join("")}`)
       }
       onMouseLeave={() => setAddToCart(false)}
       onMouseEnter={() => setAddToCart(true)}
