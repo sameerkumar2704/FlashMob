@@ -18,13 +18,10 @@ export function Pagination({
     if (isSmallScreen) {
       pages.push(
         <button
-          key={i}
-          onClick={() => onPageChange(i)}
-          className={`relative flex items-center justify-center  font-medium min-w-[2rem] px-1.5 h-8 rounded-md outline-none ${
-            currentPage === i
-              ? "text-yellow-600 bg-yellow-500/10 ring-2 ring-yellow-500"
-              : "hover:bg-gray-500/5 focus:bg-yellow-500/10"
-          } transition`}
+          key='prev'
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className='px-4 py-2 border border-gray-500 rounded-md text-sm text-gray-700 hover:bg-gray-100 focus:ring-2 focus:ring-yellow-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
         >
           Prev
         </button>
