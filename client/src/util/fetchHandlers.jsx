@@ -1,8 +1,6 @@
 export async function getDetails(url) {
   const res = await fetch(url, {
-    headers: {
-      "Content-Type": "application/json", // Set content type if necessary
-    },
+    headers: { "Content-Type": "application/json" },
     credentials: "include",
   });
   const userDetail = await res.json();

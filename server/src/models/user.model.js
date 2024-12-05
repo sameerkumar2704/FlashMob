@@ -41,6 +41,6 @@ userSchema.methods.generateRefreshToken = function () {
 userSchema.methods.isPaswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
-const User = mongoose.model("ecomuser", userSchema);
+const User = mongoose.model("user", userSchema);
 
 export { User };

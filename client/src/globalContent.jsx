@@ -17,12 +17,12 @@ export function GlobalContent({ children }) {
   useEffect(() => {
     async function verifyUser() {
       try {
-        let userDetail = await getDetails("/api/users/currentUser");
+        let userDetail = await getDetails("/api/users/currentUser", {});
 
         if (userDetail.status != "failed") {
           dispatch(currentUserInstance(JSON.parse(userDetail.detail)));
         } else {
-          userDetail = await getDetails("/api/users/refreshToken");
+          userDetail = await getDetails("/api/users/refreshToken", {});
           if (userDetail.status === "failed") {
             throw new Error(userDetail.message);
           } else {

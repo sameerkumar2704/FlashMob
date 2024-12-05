@@ -1,5 +1,17 @@
 import { Product } from "../models/product.model.js";
-import { asyncHandler } from "../util/aysncHandler.js";
+import { ApiError, asyncHandler } from "../util/aysncHandler.js";
+
+// product details of sepecific porduct
+export const prdouctDetails = asyncHandler(async (req, res) => {
+  let { productName } = req.query;
+  productName = productName.split("-").join(" ");
+  const prodcutDetails = await Product.findOne({ name: productName });
+  if (!prodcutDetails) throw new ApiError("Product Not found", 404);
+  res.json({
+    details: prodcutDetails,
+    status: "success",
+  });
+});
 
 const getAllProductList = asyncHandler(async (req, res, next) => {
   const limit = req.query.limit ? Number(req.query.limit) : undefined;

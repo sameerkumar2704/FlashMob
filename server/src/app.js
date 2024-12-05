@@ -3,7 +3,9 @@ import { userRoute } from "./routes/user.routes.js";
 import cookieParser from "cookie-parser";
 import { errorController } from "./controllers/error.controller.js";
 import { productRoute } from "./routes/product.routes.js";
+import { cartRouter } from "./routes/cart.routes.js";
 const app = express();
+
 app.use("/", (_, res, next) => {
   res.header("Access-Control-Allow-Origin", "http://localhost:5173"); // Replace with your frontend URL
   res.header("Access-Control-Allow-Credentials", "true"); // Allow credentials
@@ -18,5 +20,5 @@ app.use(cookieParser());
 app.use(errorController);
 app.use("/users", userRoute);
 app.use("/product", productRoute);
-
+app.use("/cart", cartRouter);
 export { app };

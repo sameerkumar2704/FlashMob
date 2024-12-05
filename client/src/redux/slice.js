@@ -6,7 +6,7 @@ export const getAllProducts = createAsyncThunk(
   "global/allproducts",
   async (limit) => {
     const url = limit ? `/api/product/all?limit=${limit}` : "/api/product/all";
-    const res = await getDetails(url);
+    const res = await getDetails(url, {});
     return res;
   }
 );
