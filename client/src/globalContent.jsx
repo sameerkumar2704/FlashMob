@@ -17,7 +17,7 @@ export function GlobalContent({ children }) {
   useEffect(() => {
     async function verifyUser() {
       try {
-        let userDetail = await getDetails("/api/users/currentUser", {});
+        let userDetail = await getDetails("/api/users/currentUser");
 
         if (userDetail.status != "failed") {
           dispatch(currentUserInstance(JSON.parse(userDetail.detail)));

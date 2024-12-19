@@ -1,11 +1,12 @@
 import { ComponentTitle } from "./ComponentTitle";
 import { ProductView } from "./ProductView";
 
-export function HorizontalView({ productList }) {
+export function HorizontalView({ productList, title }) {
+  console.log(productList);
   return (
     <div className=' p-4 space-y-4'>
-      <ComponentTitle title={"Product"} />
-      <div className=' max-lg:flex overflow-x-auto grid grid-cols-5 gap-2'>
+      <ComponentTitle title={title} lessElements={productList.length < 5} />
+      <div className=' flex overflow-x-auto gap-2'>
         <>
           {productList.map((product) => (
             <ProductView
@@ -17,6 +18,7 @@ export function HorizontalView({ productList }) {
                 starCount: 1,
                 price: 200,
                 faviourate: true,
+                latest: product.latest,
               }}
             />
           ))}

@@ -13,32 +13,47 @@ export const prdouctDetails = asyncHandler(async (req, res) => {
   });
 });
 
-const getAllProductList = asyncHandler(async (req, res, next) => {
+const getAllProductList = asyncHandler(async (req, res) => {
   const limit = req.query.limit ? Number(req.query.limit) : undefined;
-  let product_list = await Product.find({}).skip(20);
+  let product_list = [];
   if (limit) {
-    product_list = await Product.find({}).skip(20).limit(limit);
+    product_list = await Product.find({}).limit(limit);
   } else {
-    product_list = await Product.find({}).skip(20);
+    product_list = await Product.find({});
   }
 
   res.status(200).send(product_list);
 });
-const productsOnSale = asyncHandler(async (req, res, next) => {
-  const product_on_sale = await Product.find({ saleOn: true });
 
-  res.status(200).send(product_on_sale);
+const productsOnSale = asyncHandler(async (req, res) => {
+  const limit = req.query.limit ? Number(req.query.limit) : undefined;
+  let products = [];
+  if (limit) {
+    products = await Product.find({ saleOn: true }).limit(limit);
+  } else {
+    products = await Product.find({ saleOn: true });
+  }
+  res.status(200).send(products);
 });
 
-const newProductList = asyncHandler(async (req, res, next) => {
+const newProductList = asyncHandler(async (req, res) => {
+  const limit = req.query.limit ? Number(req.query.limit) : undefined;
   const currDate = new Date();
-
-  const product_list = await Product.find({});
-  const new_product_list = product_list.filter((product) => {
+  currDate.setDate(currDate.getDate() - 20);
+  let products = [];
+  if (limit) {
+    products = await Product.find({}).limit(limit);
+  } else {
+    products = await Product.find({});
+  }
+  products = products.filter((product) => {
     const diffInMs = currDate - product.postedOn;
     const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
     return diffInDays < 14;
   });
-  res.status(200).send(new_product_list);
+
+  products = products.map((curr) => ({ ...curr.toObject(), latest: true }));
+
+  res.status(200).send(products);
 });
 export { getAllProductList, productsOnSale, newProductList };
