@@ -1,21 +1,43 @@
 import React, { useState, useEffect } from "react";
-import { ProductView } from "../UiElements/ProductView";
 import { ProductFilter } from "../components/ProductFilter";
 import { Pagination } from "../components/Pagination";
 
-import { staticProducts } from "./staticProducts";
-
 export function FilterProductPage() {
-  const maxPrice = Math.max(...staticProducts.map((p) => p.price));
+  const [products, setProducts] = useState([]);
   const [filters, setFilters] = useState({
     category: "",
-    priceRange: maxPrice,
+    priceRange: Infinity,
   });
+  const [maxPrice, setMaxPrice] = useState(Infinity);
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage, setProductsPerPage] = useState(6);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
+  const categories = ["tv", "gaming", "audio", "mobile"];
+
+  // Fetch products data
+  useEffect(() => {
+    setLoading(true);
+    Promise.all(
+      categories.map((category) =>
+        fetch(`https://fakestoreapi.in/api/products/category?type=${category}`)
+          .then((res) => res.json())
+          .then((data) => (data.status === "SUCCESS" ? data.products : []))
+      )
+    )
+      .then((results) => {
+        const combinedProducts = results.flat().slice(0, 60); 
+        setProducts(combinedProducts);
+        const maxFetchedPrice = Math.max(...combinedProducts.map((p) => p.price));
+        setMaxPrice(maxFetchedPrice); // Set maxPrice dynamically
+        setFilters((prev) => ({ ...prev, priceRange: maxFetchedPrice })); // Update initial price range
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  // Adjust productsPerPage on window resize
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -37,7 +59,8 @@ export function FilterProductPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const filteredProducts = staticProducts.filter((product) => {
+  // Filter the products based on selected category and price range
+  const filteredProducts = products.filter((product) => {
     const withinPriceRange = product.price <= filters.priceRange;
     const matchesCategory = filters.category
       ? product.category === filters.category
@@ -54,9 +77,6 @@ export function FilterProductPage() {
   const handleFilterChange = ({ type, value }) => {
     setFilters((prev) => ({ ...prev, [type]: value }));
     setCurrentPage(1);
-    setLoading(true);
-
-    setTimeout(() => setLoading(false), 2000);
   };
 
   const handlePageChange = (page) => {
@@ -65,65 +85,71 @@ export function FilterProductPage() {
 
     setTimeout(() => {
       setLoading(false);
-    }, 1000);
+    }, 2000);
   };
 
   return (
-    <div className='flex overflow-hidden'>
+    <div className="flex overflow-hidden">
       {isSidebarOpen && (
         <div
-          className='fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden'
+          className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
           onClick={() => setIsSidebarOpen(false)}
         ></div>
       )}
       <div
-        className={`fixed top-0 left-0 h-full z-20 bg-white   px-4 py-6 transform ${
+        className={`fixed top-0 left-0 h-full z-20 bg-white px-4 py-6 transform ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 md:static md:translate-x-0`}
       >
         <ProductFilter
           onFilterChange={handleFilterChange}
           maxPrice={maxPrice}
+          categories={categories}
+          currentPriceRange={filters.priceRange}
         />
       </div>
 
       {/* Main Content */}
-      <div className='flex-1 flex flex-col px-4 py-2 relative'>
-        {/* Heading */}
-
+      <div className="flex-1 flex flex-col px-4 py-2 relative">
         <button
-          className='block md:hidden bg-red-500 outline-none  text-white px-4 py-2 rounded shadow-md mb-4'
+          className="block md:hidden bg-red-500 text-white px-4 py-2 rounded shadow-md mb-4"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         >
           Filter
         </button>
 
-        {/* Loader */}
         {loading ? (
-          <div className='flex justify-center items-center flex-1'>
-            <div className='loader border-t-4 border-red-500 rounded-full w-16 h-16 animate-spin'></div>
+          <div className="flex justify-center items-center flex-1">
+            <div className="w-16 h-16 border-4 border-gray-300 border-t-red-500 rounded-full animate-spin"></div>
           </div>
         ) : (
           <>
-            <div className=' p-2 h-full flex flex-col justify-between gap-5 overflow-y-auto  w-full box-border '>
-              {/* Product Grid */}
-              <div className=' max-[450px]:grid-cols-1   max-[1000px]:grid-cols-2 max-xl:grid-cols-3 h-fit   grid grid-cols-4 gap-4 '>
+            <div className="p-2 h-full flex flex-col justify-between gap-5 overflow-y-auto w-full box-border">
+              <div className="max-[450px]:grid-cols-1 max-[1000px]:grid-cols-2 max-xl:grid-cols-3 h-fit grid grid-cols-4 gap-4">
                 {displayedProducts.map((product) => (
-                  <ProductView
+                  <div
                     key={product.id}
-                    productDetails={{
-                      img: product.images[0].url,
-                      title: product.name,
-                      price: product.price,
-                      isSoldOut: product.isSoldOut,
-                      starCount: 3,
-                    }}
-                  />
+                    className="p-4 border rounded shadow-md"
+                  >
+                    <img
+                      src={product.image}
+                      alt={product.title}
+                      className="w-full h-48 object-cover"
+                    />
+                    <h2 className="text-lg font-bold">{product.title}</h2>
+                    <p className="text-gray-700">${product.price}</p>
+                    <p className="text-gray-500 text-sm line-clamp-2">
+                      {product.description}
+                    </p>
+                    <p className="text-gray-600 text-sm">
+                      Brand: {product.brand}
+                    </p>
+                    <p className="text-gray-600 text-sm">
+                      Model: {product.model}
+                    </p>
+                  </div>
                 ))}
               </div>
-
-              {/* Pagination at the bottom */}
-
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
