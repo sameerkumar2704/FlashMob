@@ -75,19 +75,18 @@ function SizeSelector({ selectedSize, setSelectedSize, currSize }) {
 }
 
 function ProductDetails() {
-  const { productTitle } = useParams();
+  const { productId } = useParams();
   const [productDetails, setProdcutDetails] = useState(undefined);
   const [presentInCart, setPresentInCart] = useState(false);
   const { currentUser } = useSelector((state) => state.global);
   useEffect(() => {
     asyncHandler(async () => {
       const res = await getDetails(
-        `http://localhost:8080/product/?productName=${productTitle}`,
-        {}
+        `http://localhost:8080/product?productId=${productId}`
       );
       setProdcutDetails(res.details);
     })();
-  }, [productTitle]);
+  }, [productId]);
   useEffect(() => {
     if (!productDetails) return;
     asyncHandler(async () => {
@@ -128,14 +127,18 @@ function ProductDetails() {
 
   const incrementQuantity = () => setQuantity(quantity + 1);
   const decrementQuantity = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
+
+  if (!productDetails) return <h1>Loading...</h1>;
   return (
     <div className='p-4 sm:p-6 grid gap-10 md:grid-cols-2'>
       {/* Image Section */}
-      <ProductOverviewImage images={product.images} />
+      <img className=' h-[60vh] object-cover' src={productDetails.image} />
 
       {/* Product Info Section */}
       <div>
-        <h1 className='text-2xl sm:text-3xl font-bold mb-2'>{product.title}</h1>
+        <h1 className='text-2xl sm:text-3xl font-bold mb-2'>
+          {productDetails.title}
+        </h1>
         <div className='flex items-center gap-2 mb-2'>
           <span className='text-lg font-semibold text-yellow-500'>
             {product.rating} ⭐
@@ -145,16 +148,10 @@ function ProductDetails() {
           </span>
         </div>
         <h2 className='text-xl sm:text-2xl font-semibold text-red-500 mb-4'>
-          ${product.price.toFixed(2)}
+          ${productDetails.price.toFixed(2)}
         </h2>
 
-        <p className='text-gray-700 mb-2'>{product.description}</p>
-
-        <ul className='list-disc list-inside text-gray-600 mb-4'>
-          {product.highlights.map((highlight, idx) => (
-            <li key={idx}>{highlight}</li>
-          ))}
-        </ul>
+        <p className='text-gray-700 mb-2'>{productDetails.description}</p>
 
         {/* Colors */}
         <div className='mb-4'>
@@ -172,19 +169,6 @@ function ProductDetails() {
         </div>
 
         {/* Sizes */}
-        <div className='mb-6'>
-          <p className='font-semibold mb-2'>Select Size:</p>
-          <div className='flex gap-2 sm:gap-3'>
-            {product.sizes.map((size) => (
-              <SizeSelector
-                key={size}
-                currSize={size}
-                selectedSize={selectedSize}
-                setSelectedSize={setSelectedSize}
-              />
-            ))}
-          </div>
-        </div>
 
         {/* Quantity and Buttons */}
         <div className='flex flex-wrap gap-4 items-center mb-6'>

@@ -2,7 +2,8 @@ import { loadingState } from "@/redux/slice";
 import { Category } from "@/UiElements/category";
 import { HorizontalView } from "@/UiElements/HorizontalView";
 import { getDetails } from "@/util/fetchHandlers";
-import { useEffect, useState } from "react";
+import { Underline } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export function HomePage() {
@@ -11,50 +12,64 @@ export function HomePage() {
   const [discountedProducts, setDiscountedProducts] = useState([]);
   const [newProducts, setNewProducts] = useState([]);
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    async function getAllProducts() {
-      const url = `/api/product/all?limit=5`;
+  const getAllProducts = useCallback(
+    (category) => {
+      let url = `/api/product/all?limit=5`;
+      if (category !== "all") url += `&category=${category}`;
       dispatch(loadingState(true));
       getDetails(url).then((curr) => {
         setProducts(curr);
       });
-    }
-    async function getDiscountedProducts() {
-      const url = `/api/product/sale?limit=5`;
+    },
+    [dispatch]
+  );
+  const getDiscountedProducts = useCallback(
+    (category) => {
+      let url = `/api/product/sale?limit=5`;
+      console.log(category);
+      if (category !== "all") url += `&category=${category}`;
       dispatch(loadingState(true));
       getDetails(url).then((curr) => {
         setDiscountedProducts(curr);
       });
-    }
-    async function getNewProducts() {
-      const url = `/api/product/new?limit=5`;
+    },
+    [dispatch]
+  );
+  const getNewProducts = useCallback(
+    (category) => {
+      let url = `/api/product/new?limit=5`;
+      if (category !== "all") url += `&categroy=${category}`;
       dispatch(loadingState(true));
       getDetails(url).then((curr) => {
         setNewProducts(curr);
       });
-    }
+    },
+    [dispatch]
+  );
+  const LoadData = useCallback(
+    (category) => {
+      Promise.all([
+        getAllProducts(category),
+        getDiscountedProducts(category),
+        getNewProducts(category),
+      ]).finally(() => dispatch(loadingState(false)));
+    },
+    [dispatch, getAllProducts, getDiscountedProducts, getNewProducts]
+  );
 
-    Promise.all([
-      getAllProducts(),
-      getDiscountedProducts(),
-      getNewProducts(),
-    ]).finally(() => dispatch(loadingState(false)));
-  }, []);
-  if (isDataLoading) {
-    return <h1>Loading .... {isDataLoading}</h1>;
-  }
   return (
     <>
       <div className=' h-full space-y-8 overflow-scroll scroll-smooth hide-scroll-bar'>
-        <Category />
+        <Category dataHandler={LoadData} />
 
         <HorizontalView
           title={"Discounted Products"}
           productList={discountedProducts}
         />
         <HorizontalView title={"Products"} productList={products} />
-        <HorizontalView title={"New Products"} productList={newProducts} />
+        {newProducts.length > 0 && (
+          <HorizontalView title={"New Products"} productList={newProducts} />
+        )}
       </div>
     </>
   );

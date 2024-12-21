@@ -13,11 +13,10 @@ export function HorizontalView({ productList, title }) {
               Key={product}
               productDetails={{
                 id: product._id,
-                img: product.images[0].url,
-                title: product.name,
+                img: product.image,
+                title: product.title,
                 starCount: 1,
-                price: 200,
-                faviourate: true,
+                price: product.price,
                 latest: product.latest,
               }}
             />

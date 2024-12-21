@@ -1,54 +1,22 @@
 import mongoose, { Schema } from "mongoose";
 
 const productModel = {
-  name: { type: String, required: true },
-  descirption: { type: String, required: true },
-  stock: { required: true, type: Number },
-  rating: {
-    required: true,
-    type: Number,
-  },
-  saleOn: { type: Boolean, required: true },
-  availabeToPurchaseOn: { type: String, required: true },
-  color: {
-    type: [String],
-    default: [],
-  },
-  size: {
-    type: [String],
-    default: [],
-  },
-  category: {
-    type: [String],
-    default: [],
-  },
-  price: {
-    type: Number,
-    required: true,
-  },
-  discount: {
-    type: Number,
-    required: true,
-  },
-  images: {
-    type: [
-      {
-        url: String,
-        alt: String,
-      },
-    ],
-    default: [],
-  },
+  title: { type: String, required: true },
+  image: { type: String, required: true },
+  price: { type: Number, required: true },
+  description: { type: String, required: true },
+  brand: { type: String, required: true },
+  discount: { type: Number },
+  onSale: { type: Boolean, default: false },
+  model: { type: String, required: true },
   reviews: [
     {
       type: Schema.Types.ObjectId,
       ref: "ecomusers",
     },
   ],
-  postedOn: Date,
-  lastUpdated: Date,
 };
 
-const porductSchema = mongoose.Schema(productModel);
+const porductSchema = mongoose.Schema(productModel, { timestamps: true });
 const Product = mongoose.model("product", porductSchema);
 export { Product };
