@@ -5,8 +5,10 @@ import {
   cartItemList,
   isPresentInCart,
 } from "../controllers/cart.controller.js";
+import { verifyToken } from "../middelwares/user.middelware.js";
+
 const cartRouter = express.Router();
-cartRouter.route("/add").post(addElementInCart);
-cartRouter.get("/productIsPresent", isPresentInCart);
-cartRouter.get("/all", cartItemList);
+cartRouter.route("/add").post(verifyToken, addElementInCart);
+cartRouter.route("/productIsPresent").get(verifyToken, isPresentInCart);
+cartRouter.get("/all", verifyToken, cartItemList);
 export { cartRouter };

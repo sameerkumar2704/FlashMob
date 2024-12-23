@@ -18,6 +18,7 @@ const verifyToken = asyncHandler(async (req, res, next) => {
   if (!decodeToken) throw new ApiError("Access Token not Found", 404);
   const user = await User.findById(decodeToken._id);
   if (!user) throw new ApiError("User not found", 404);
+
   req.user = user;
 
   next();

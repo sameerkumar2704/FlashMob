@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { ProductFilter } from "../components/ProductFilter";
 import { Pagination } from "../components/Pagination";
+import { useLoaderData } from "react-router-dom";
 
 export function FilterProductPage() {
+  const productList = useLoaderData(); // data accroding routing call like cart list or view all products
+
   const [products, setProducts] = useState([]);
   const [filters, setFilters] = useState({
     category: "",
@@ -27,9 +30,11 @@ export function FilterProductPage() {
       )
     )
       .then((results) => {
-        const combinedProducts = results.flat().slice(0, 60); 
+        const combinedProducts = results.flat().slice(0, 60);
         setProducts(combinedProducts);
-        const maxFetchedPrice = Math.max(...combinedProducts.map((p) => p.price));
+        const maxFetchedPrice = Math.max(
+          ...combinedProducts.map((p) => p.price)
+        );
         setMaxPrice(maxFetchedPrice); // Set maxPrice dynamically
         setFilters((prev) => ({ ...prev, priceRange: maxFetchedPrice })); // Update initial price range
         setLoading(false);
@@ -89,10 +94,10 @@ export function FilterProductPage() {
   };
 
   return (
-    <div className="flex overflow-hidden">
+    <div className='flex overflow-hidden'>
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
+          className='fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden'
           onClick={() => setIsSidebarOpen(false)}
         ></div>
       )}
@@ -110,41 +115,41 @@ export function FilterProductPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col px-4 py-2 relative">
+      <div className='flex-1 flex flex-col px-4 py-2 relative'>
         <button
-          className="block md:hidden bg-red-500 text-white px-4 py-2 rounded shadow-md mb-4"
+          className='block md:hidden bg-red-500 text-white px-4 py-2 rounded shadow-md mb-4'
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         >
           Filter
         </button>
 
         {loading ? (
-          <div className="flex justify-center items-center flex-1">
-            <div className="w-16 h-16 border-4 border-gray-300 border-t-red-500 rounded-full animate-spin"></div>
+          <div className='flex justify-center items-center flex-1'>
+            <div className='w-16 h-16 border-4 border-gray-300 border-t-red-500 rounded-full animate-spin'></div>
           </div>
         ) : (
           <>
-            <div className="p-2 h-full flex flex-col justify-between gap-5 overflow-y-auto w-full box-border">
-              <div className="max-[450px]:grid-cols-1 max-[1000px]:grid-cols-2 max-xl:grid-cols-3 h-fit grid grid-cols-4 gap-4">
+            <div className='p-2 h-full flex flex-col justify-between gap-5 overflow-y-auto w-full box-border'>
+              <div className='max-[450px]:grid-cols-1 max-[1000px]:grid-cols-2 max-xl:grid-cols-3 h-fit grid grid-cols-4 gap-4'>
                 {displayedProducts.map((product) => (
                   <div
                     key={product.id}
-                    className="p-4 border rounded shadow-md"
+                    className='p-4 border rounded shadow-md'
                   >
                     <img
                       src={product.image}
                       alt={product.title}
-                      className="w-full h-48 object-cover"
+                      className='w-full h-48 object-cover'
                     />
-                    <h2 className="text-lg font-bold">{product.title}</h2>
-                    <p className="text-gray-700">${product.price}</p>
-                    <p className="text-gray-500 text-sm line-clamp-2">
+                    <h2 className='text-lg font-bold'>{product.title}</h2>
+                    <p className='text-gray-700'>${product.price}</p>
+                    <p className='text-gray-500 text-sm line-clamp-2'>
                       {product.description}
                     </p>
-                    <p className="text-gray-600 text-sm">
+                    <p className='text-gray-600 text-sm'>
                       Brand: {product.brand}
                     </p>
-                    <p className="text-gray-600 text-sm">
+                    <p className='text-gray-600 text-sm'>
                       Model: {product.model}
                     </p>
                   </div>

@@ -1,18 +1,47 @@
+import mongoose from "mongoose";
 import { Cart } from "../models/cart.model.js";
-import { asyncHandler } from "../util/aysncHandler.js";
+import { ApiError, asyncHandler } from "../util/aysncHandler.js";
 
 export const addElementInCart = asyncHandler(async (req, res) => {
   const { user, product_item } = req.body;
-  const user_cart = await Cart.findOne({ user });
-  if (!user_cart) {
-    const new_data = {
-      user,
-      product_list: [product_item],
-    };
-    await Cart.create(new_data);
-  } else {
-    await Cart.updateOne({ user }, { $push: { product_list: product_item } });
+
+  const user_cart = await Cart.findOne({ user: user });
+  try {
+    if (!user_cart) {
+      const new_data = {
+        user,
+        product_list: [
+          {
+            product: product_item,
+          },
+        ],
+      };
+      await Cart.create(new_data);
+    } else {
+      let prodcutPresentIncart = await Cart.findOne({
+        user, // The user who owns the cart
+        product_list: { $elemMatch: { product: product_item } }, // Check if product_item exists in product_list
+      });
+      if (prodcutPresentIncart) {
+        await Cart.updateOne(
+          { user: user, "product_list.product": product_item }, // Find the cart for the user and check for the product
+          {
+            $inc: { "product_list.$.quantity": 1 }, // Increment the quantity if product is found
+          }
+        );
+      } else {
+        await Cart.updateOne(
+          { user },
+          {
+            $push: { product_list: { product: product_item, quantity: 1 } }, // Add new product if it's not found
+          }
+        );
+      }
+    }
+  } catch (e) {
+    throw new ApiError(e.message, 404);
   }
+
   res.status(200).json({
     status: "sucess",
     message: "product added to cart",
@@ -21,10 +50,15 @@ export const addElementInCart = asyncHandler(async (req, res) => {
 
 export const isPresentInCart = asyncHandler(async (req, res) => {
   const { user, product_item } = req.query;
-  const product = await Cart.findOne({
-    user,
-    product_list: { $in: [product_item] },
-  });
+  let product = null;
+  try {
+    product = await Cart.findOne({
+      user, // The user who owns the cart
+      product_list: { $elemMatch: { product: product_item } }, // Check if product_item exists in product_list
+    });
+  } catch (e) {
+    throw new ApiError("Database Error : " + e.message, 504);
+  }
 
   res.status(200).json({
     status: "success",
@@ -33,10 +67,16 @@ export const isPresentInCart = asyncHandler(async (req, res) => {
 });
 
 export const cartItemList = asyncHandler(async (req, res) => {
-  const { user } = req.query;
-  const { product_list } = await Cart.findOne({ user });
+  const user = req.user;
+
+  if (!mongoose.Types.ObjectId.isValid(user)) {
+    throw new ApiError("Invalid user ID", 502);
+  }
+
+  let cartDoc = await Cart.findOne({ user });
+  const cartList = cartDoc?.product_list ?? [];
   return res.json({
     status: "success",
-    productList: product_list,
+    productList: cartList,
   });
 });

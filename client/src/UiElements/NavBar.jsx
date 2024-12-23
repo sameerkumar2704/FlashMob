@@ -11,6 +11,7 @@ import {
   navigationDrawerStateUpdate,
   setStateOfDialogBox,
 } from "@/redux/slice";
+import { Link } from "react-router-dom";
 
 export function NavBar() {
   const { currentUser, navigationDrawerState } = useSelector(
@@ -44,11 +45,11 @@ export function NavBar() {
           <li>
             <MenuItem icon={<GoHeart className=' w-full h-full' />} />
           </li>
-          <li>
+          <Link to={"/cart"}>
             <MenuItem
               icon={<PiShoppingCartLight className='w-full h-full' />}
             />
-          </li>
+          </Link>
           {currentUser !== undefined && (
             <li className='  flex gap-2'>
               <div className=' p-1 border border-red-100  rounded-full  h-8 w-8'>

@@ -1,11 +1,17 @@
+import mongoose from "mongoose";
 import { Product } from "../models/product.model.js";
 import { ApiError, asyncHandler } from "../util/aysncHandler.js";
 
 // product details of sepecific porduct
 export const prdouctDetails = asyncHandler(async (req, res) => {
   let { productId } = req.query;
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    console.log("Bad Request");
+    throw new ApiError("Invalid product ID", 400); // Bad Request
+  }
 
-  const prodcutDetails = await Product.findOne({ _id: productId });
+  let prodcutDetails = await Product.findOne({ _id: productId });
+
   if (!prodcutDetails) throw new ApiError("Product Not found", 404);
   res.json({
     details: prodcutDetails,
@@ -24,13 +30,18 @@ const getAllProductList = asyncHandler(async (req, res) => {
   if (category !== "all") {
     query.category = { $in: [category] };
   }
-
-  if (limit) {
-    product_list = await Product.find(query).limit(limit);
-  } else {
-    product_list = await Product.find(query);
+  try {
+    if (limit) {
+      product_list = await Product.find(query).limit(limit);
+    } else {
+      product_list = await Product.find(query);
+    }
+  } catch (e) {
+    throw new ApiError(e.message, 404);
   }
-  console.log(product_list);
+
+  if (!product_list)
+    throw new ApiError("Product Routes is Working Sorry ", 502);
   res.status(200).send(product_list);
 });
 
@@ -45,12 +56,18 @@ const productsOnSale = asyncHandler(async (req, res) => {
     query.category = { $in: [category] };
   }
 
-  let products;
-  if (limit) {
-    products = await Product.find(query).limit(limit);
-  } else {
-    products = await Product.find(query);
+  let products = null;
+  try {
+    if (limit) {
+      products = await Product.find(query).limit(limit);
+    } else {
+      products = await Product.find(query);
+    }
+  } catch (e) {
+    throw new ApiError(e.message, 404);
   }
+
+  if (!products) throw new ApiError("Product Routes is Working Sorry ", 502);
 
   res.status(200).send(products);
 });
@@ -65,11 +82,17 @@ const newProductList = asyncHandler(async (req, res) => {
   if (category !== "all") {
     query.category = { $in: [category] };
   }
-  if (limit) {
-    products = await Product.find(query).limit(limit);
-  } else {
-    products = await Product.find(query);
+  try {
+    if (limit) {
+      products = await Product.find(query).limit(limit);
+    } else {
+      products = await Product.find(query);
+    }
+  } catch (e) {
+    throw new ApiError(e.message, 404);
   }
+
+  if (!products) throw new ApiError("Product Routes is Working Sorry ", 502);
   products = products.filter((product) => {
     const diffInMs = currDate - product.createdAt;
     const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
