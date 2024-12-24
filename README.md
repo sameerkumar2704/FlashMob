@@ -1,6 +1,10 @@
 
 # FlashMob
 
+![image](https://github.com/user-attachments/assets/92e902a9-2360-408d-ba36-d4fa1cb4b5bc)
+
+---
+
 Welcome to the Electronic Device Marketplace repository! This project is designed to provide users with a seamless experience for exploring, comparing, and purchasing electronic devices. Below, you'll find all the details necessary to set up, understand, and contribute to the project as a developer.
 
 ## Key Features:  
