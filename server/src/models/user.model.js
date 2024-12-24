@@ -1,12 +1,15 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 const userModel = {
   username: { type: String, required: true },
   password: { type: String, required: true },
   phonenumber: { type: Number, required: true },
   email: { type: String, required: true, unique: true },
+  passwordResetToken: String,
+  passwordResetTokenExpire: Date,
 };
 
 const userSchema = mongoose.Schema(userModel, { timestamps: true });
@@ -45,6 +48,17 @@ userSchema.methods.generateRefreshToken = function () {
 userSchema.methods.isPaswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
+userSchema.methods.createPasswordRestToken = function () {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+  this.passwordResetTokenExpire = Date.now() + 5 * 60 * 1000;
+
+  return resetToken;
+};
+this;
 const User = mongoose.model("user", userSchema);
 
 export { User };

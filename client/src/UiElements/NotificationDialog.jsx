@@ -13,6 +13,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { MdCancel } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 const context = createContext(undefined);
 const useNotificiationContext = () => {
@@ -157,6 +158,9 @@ const LoginInForm = () => {
         <Input ref={email} placeholder='Email' />
         <Input ref={password} placeholder='Password' />
       </form>
+      <Link to='/forgotPassword' className=' text-sm text-left'>
+        forgot password ??
+      </Link>
       <Button
         onClick={asyncHandler(async () => {
           const obj = {
