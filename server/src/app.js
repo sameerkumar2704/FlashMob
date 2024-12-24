@@ -19,8 +19,9 @@ app.use("/", (_, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(errorController);
+
 app.use("/users", userRoute);
 app.use("/product", productRoute);
 app.use("/cart", cartRouter);
+app.use(errorController);
 export { app };

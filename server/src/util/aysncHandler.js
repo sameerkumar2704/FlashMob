@@ -1,15 +1,12 @@
 class ApiError extends Error {
-  constructor(message, status) {
+  constructor(message, status = 500) {
     super(message);
     this.status = status;
   }
 }
 function asyncHandler(func) {
   return (req, res, next) => {
-    func(req, res, next).catch((err) => {
-      res.status(err.status).json({ status: "failed", message: err.message });
-      return;
-    });
+    func(req, res, next).catch((err) => next(err));
   };
 }
 

@@ -6,40 +6,37 @@ export const addElementInCart = asyncHandler(async (req, res) => {
   const { user, product_item } = req.body;
 
   const user_cart = await Cart.findOne({ user: user });
-  try {
-    if (!user_cart) {
-      const new_data = {
-        user,
-        product_list: [
-          {
-            product: product_item,
-          },
-        ],
-      };
-      await Cart.create(new_data);
+
+  if (!user_cart) {
+    const new_data = {
+      user,
+      product_list: [
+        {
+          product: product_item,
+        },
+      ],
+    };
+    await Cart.create(new_data);
+  } else {
+    let prodcutPresentIncart = await Cart.findOne({
+      user, // The user who owns the cart
+      product_list: { $elemMatch: { product: product_item } }, // Check if product_item exists in product_list
+    });
+    if (prodcutPresentIncart) {
+      await Cart.updateOne(
+        { user: user, "product_list.product": product_item }, // Find the cart for the user and check for the product
+        {
+          $inc: { "product_list.$.quantity": 1 }, // Increment the quantity if product is found
+        }
+      );
     } else {
-      let prodcutPresentIncart = await Cart.findOne({
-        user, // The user who owns the cart
-        product_list: { $elemMatch: { product: product_item } }, // Check if product_item exists in product_list
-      });
-      if (prodcutPresentIncart) {
-        await Cart.updateOne(
-          { user: user, "product_list.product": product_item }, // Find the cart for the user and check for the product
-          {
-            $inc: { "product_list.$.quantity": 1 }, // Increment the quantity if product is found
-          }
-        );
-      } else {
-        await Cart.updateOne(
-          { user },
-          {
-            $push: { product_list: { product: product_item, quantity: 1 } }, // Add new product if it's not found
-          }
-        );
-      }
+      await Cart.updateOne(
+        { user },
+        {
+          $push: { product_list: { product: product_item, quantity: 1 } }, // Add new product if it's not found
+        }
+      );
     }
-  } catch (e) {
-    throw new ApiError(e.message, 404);
   }
 
   res.status(200).json({
@@ -51,14 +48,11 @@ export const addElementInCart = asyncHandler(async (req, res) => {
 export const isPresentInCart = asyncHandler(async (req, res) => {
   const { user, product_item } = req.query;
   let product = null;
-  try {
-    product = await Cart.findOne({
-      user, // The user who owns the cart
-      product_list: { $elemMatch: { product: product_item } }, // Check if product_item exists in product_list
-    });
-  } catch (e) {
-    throw new ApiError("Database Error : " + e.message, 504);
-  }
+
+  product = await Cart.findOne({
+    user, // The user who owns the cart
+    product_list: { $elemMatch: { product: product_item } }, // Check if product_item exists in product_list
+  });
 
   res.status(200).json({
     status: "success",

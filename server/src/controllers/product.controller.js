@@ -30,14 +30,11 @@ const getAllProductList = asyncHandler(async (req, res) => {
   if (category !== "all") {
     query.category = { $in: [category] };
   }
-  try {
-    if (limit) {
-      product_list = await Product.find(query).limit(limit);
-    } else {
-      product_list = await Product.find(query);
-    }
-  } catch (e) {
-    throw new ApiError(e.message, 404);
+
+  if (limit) {
+    product_list = await Product.find(query).limit(limit);
+  } else {
+    product_list = await Product.find(query);
   }
 
   if (!product_list)
@@ -57,14 +54,11 @@ const productsOnSale = asyncHandler(async (req, res) => {
   }
 
   let products = null;
-  try {
-    if (limit) {
-      products = await Product.find(query).limit(limit);
-    } else {
-      products = await Product.find(query);
-    }
-  } catch (e) {
-    throw new ApiError(e.message, 404);
+
+  if (limit) {
+    products = await Product.find(query).limit(limit);
+  } else {
+    products = await Product.find(query);
   }
 
   if (!products) throw new ApiError("Product Routes is Working Sorry ", 502);
@@ -82,14 +76,11 @@ const newProductList = asyncHandler(async (req, res) => {
   if (category !== "all") {
     query.category = { $in: [category] };
   }
-  try {
-    if (limit) {
-      products = await Product.find(query).limit(limit);
-    } else {
-      products = await Product.find(query);
-    }
-  } catch (e) {
-    throw new ApiError(e.message, 404);
+
+  if (limit) {
+    products = await Product.find(query).limit(limit);
+  } else {
+    products = await Product.find(query);
   }
 
   if (!products) throw new ApiError("Product Routes is Working Sorry ", 502);

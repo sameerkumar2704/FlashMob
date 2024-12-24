@@ -107,7 +107,6 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
       message: message,
     });
   } catch (e) {
-    console.log(e.message);
     user.passwordRestToken = undefined;
     user.passwordResetTokenExpire = undefined;
     user.save();
@@ -151,14 +150,11 @@ const refreshAcessToken = asyncHandler(async (req, res) => {
   console.log(refreshAccessToken);
   if (!refreshAccessToken) throw new ApiError("Access Token not Found", 404);
   let decodeToken = undefined;
-  try {
-    decodeToken = jwt.verify(
-      refreshAccessToken,
-      process.env.REFRESH_TOKEN_SECRET
-    );
-  } catch (e) {
-    throw new ApiError(404, e.message);
-  }
+
+  decodeToken = jwt.verify(
+    refreshAccessToken,
+    process.env.REFRESH_TOKEN_SECRET
+  );
 
   const user_obj = await User.findById(decodeToken._id);
   if (!user_obj) throw new ApiError(404, "User not found");
