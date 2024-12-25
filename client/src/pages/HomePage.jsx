@@ -14,11 +14,11 @@ export function HomePage() {
   const dispatch = useDispatch();
   const getAllProducts = useCallback(
     (category) => {
-      let url = `/api/product/all?limit=5`;
+      let url = `/api/product/all?limit=5&&products=other`;
       if (category !== "all") url += `&category=${category}`;
       dispatch(loadingState(true));
       getDetails(url).then((curr) => {
-        setProducts(curr);
+        setProducts(curr.list);
       });
     },
     [dispatch]
@@ -30,7 +30,7 @@ export function HomePage() {
       if (category !== "all") url += `&category=${category}`;
       dispatch(loadingState(true));
       getDetails(url).then((curr) => {
-        setDiscountedProducts(curr);
+        setDiscountedProducts(curr.list);
       });
     },
     [dispatch]
@@ -41,7 +41,7 @@ export function HomePage() {
       if (category !== "all") url += `&categroy=${category}`;
       dispatch(loadingState(true));
       getDetails(url).then((curr) => {
-        setNewProducts(curr);
+        setNewProducts(curr.list);
       });
     },
     [dispatch]
@@ -61,14 +61,17 @@ export function HomePage() {
     <>
       <div className=' h-full space-y-8 overflow-scroll scroll-smooth hide-scroll-bar'>
         <Category dataHandler={LoadData} />
-
-        <HorizontalView
-          title={"Discounted Products"}
-          productList={discountedProducts}
-        />
-        <HorizontalView title={"Products"} productList={products} />
         {newProducts.length > 0 && (
           <HorizontalView title={"New Products"} productList={newProducts} />
+        )}
+        {discountedProducts.length > 0 && (
+          <HorizontalView
+            title={"Discounted Products"}
+            productList={discountedProducts}
+          />
+        )}
+        {products.length > 0 && (
+          <HorizontalView title={"Products"} productList={products} />
         )}
       </div>
     </>

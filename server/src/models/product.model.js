@@ -17,6 +17,7 @@ const productModel = {
   ],
 };
 
-const porductSchema = mongoose.Schema(productModel, { timestamps: true });
-const Product = mongoose.model("product", porductSchema);
+const productSchema = mongoose.Schema(productModel, { timestamps: true });
+productSchema.index({ title: "text" });
+const Product = mongoose.model("product", productSchema);
 export { Product };

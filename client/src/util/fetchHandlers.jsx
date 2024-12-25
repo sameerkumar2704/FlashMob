@@ -1,4 +1,5 @@
 export async function getDetails(url) {
+  console.log(url);
   const res = await fetch(url, {
     headers: { "Content-Type": "application/json" },
     credentials: "include",

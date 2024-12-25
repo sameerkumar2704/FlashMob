@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Cart } from "../models/cart.model.js";
 import { ApiError, asyncHandler } from "../util/aysncHandler.js";
+import { Product } from "../models/product.model.js";
 
 export const addElementInCart = asyncHandler(async (req, res) => {
   const { user, product_item } = req.body;
@@ -69,8 +70,18 @@ export const cartItemList = asyncHandler(async (req, res) => {
 
   let cartDoc = await Cart.findOne({ user });
   const cartList = cartDoc?.product_list ?? [];
+  const productsInCart = await Promise.all(
+    cartList.map(async ({ product, quantity }) => {
+      const productRef = await Product.findById(product);
+      const obj = productRef.toObject();
+      return { ...obj, quantity };
+    })
+  );
+
+  console.log(productsInCart);
   return res.json({
     status: "success",
-    productList: cartList,
+    type: "cart",
+    list: productsInCart,
   });
 });

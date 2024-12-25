@@ -20,78 +20,92 @@ export const prdouctDetails = asyncHandler(async (req, res) => {
 });
 
 const getAllProductList = asyncHandler(async (req, res) => {
-  const limit = req.query.limit ? Number(req.query.limit) : undefined;
-  let product_list = [];
-  const category = req.query.category || "all"; // Default to "all" if undefined
+  let searchQuery = req.query.search || "";
+  let words = searchQuery.split(" ");
+  const escapeRegex = (word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  let regexPattern = words
+    .map((word) => `\\b${escapeRegex(word)}\\b`)
+    .join("|");
+  console.log(regexPattern);
+  const excludeField = [
+    "sort",
+    "page",
+    "limit",
+    "fields",
+    "products",
+    "search",
+  ];
+  const currDate = new Date();
+  currDate.setDate(currDate.getDate() - 20);
+  const queryObj = { ...req.query }; // due to avoid pass by refrecnce we used spread
 
-  let query = {}; // Initialize the base query
+  excludeField.forEach((curr) => delete queryObj[curr]);
+  const constr = {
+    ...queryObj,
+    title: { $regex: regexPattern, $options: "i" },
+  };
 
-  // Add category filter only if it's not "all"
-  if (category !== "all") {
-    query.category = { $in: [category] };
+  let query = Product.find(constr);
+  if (req.query.products) {
+    console.log(constr);
+    query = query.where("onSale").exists(false);
+    query = query.where("createdAt").lte(currDate);
+  }
+  if (req.query.limit) {
+    query = query.limit(req.query.limit); // Ensure limit is a number
   }
 
-  if (limit) {
-    product_list = await Product.find(query).limit(limit);
-  } else {
-    product_list = await Product.find(query);
-  }
-
+  let product_list = await query;
   if (!product_list)
     throw new ApiError("Product Routes is Working Sorry ", 502);
-  res.status(200).send(product_list);
+  res.status(200).send({
+    statu: "success",
+    type: "all",
+    list: product_list,
+  });
 });
 
 const productsOnSale = asyncHandler(async (req, res) => {
-  const limit = req.query.limit ? Number(req.query.limit) : undefined;
-  const category = req.query.category || "all"; // Default to "all" if undefined
-
-  let query = { onSale: true }; // Initialize the base query
-
-  // Add category filter only if it's not "all"
-  if (category !== "all") {
-    query.category = { $in: [category] };
+  const excludeField = ["sort", "page", "limit", "fields", "products"];
+  const queryObj = { ...req.query, onSale: true };
+  excludeField.forEach((curr) => delete queryObj[curr]);
+  let query = Product.find(queryObj);
+  if (req.query.limit) {
+    query = query.limit(req.query.limit); // Ensure limit is a number
   }
-
-  let products = null;
-
-  if (limit) {
-    products = await Product.find(query).limit(limit);
-  } else {
-    products = await Product.find(query);
-  }
+  let products = await query;
 
   if (!products) throw new ApiError("Product Routes is Working Sorry ", 502);
 
-  res.status(200).send(products);
+  res.status(200).send({
+    statu: "success",
+    type: "sale",
+    list: products,
+  });
 });
 
 const newProductList = asyncHandler(async (req, res) => {
-  const limit = req.query.limit ? Number(req.query.limit) : undefined;
+  const excludeField = ["sort", "page", "limit", "fields", "products"];
   const currDate = new Date();
   currDate.setDate(currDate.getDate() - 20);
-  let products = [];
-  const category = req.query.category || "all";
-  let query = {};
-  if (category !== "all") {
-    query.category = { $in: [category] };
+  const queryObj = { ...req.query }; // due to avoid pass by refrecnce we used spread
+
+  excludeField.forEach((curr) => delete queryObj[curr]);
+
+  let query = Product.find(queryObj).where("createdAt").gt(currDate);
+
+  if (req.query.limit) {
+    query = query.limit(req.query.limit); // Ensure limit is a number
   }
 
-  if (limit) {
-    products = await Product.find(query).limit(limit);
-  } else {
-    products = await Product.find(query);
-  }
-
-  if (!products) throw new ApiError("Product Routes is Working Sorry ", 502);
-  products = products.filter((product) => {
-    const diffInMs = currDate - product.createdAt;
-    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-    return diffInDays < 14;
-  });
+  let products = await query;
 
   products = products.map((curr) => ({ ...curr.toObject(), latest: true }));
 
-  res.status(200).send(products);
+  res.status(200).send({
+    statu: "success",
+    type: "new",
+    list: products,
+  });
 });
 export { getAllProductList, productsOnSale, newProductList };

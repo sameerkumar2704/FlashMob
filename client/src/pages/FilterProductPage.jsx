@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import { ProductFilter } from "../components/ProductFilter";
 import { Pagination } from "../components/Pagination";
 import { useLoaderData } from "react-router-dom";
+import { ProductView } from "../UiElements/ProductView";
 
 export function FilterProductPage() {
-  const productList = useLoaderData(); // data accroding routing call like cart list or view all products
-
+  let productList = useLoaderData(); // data accroding routing call like cart list or view all products
+  const [list, setList] = useState([]);
   const [products, setProducts] = useState([]);
   const [filters, setFilters] = useState({
     category: "",
@@ -18,7 +19,9 @@ export function FilterProductPage() {
   const [loading, setLoading] = useState(true);
 
   const categories = ["tv", "gaming", "audio", "mobile"];
-
+  useEffect(() => {
+    setList(productList.list);
+  }, [productList]);
   // Fetch products data
   useEffect(() => {
     setLoading(true);
@@ -131,28 +134,18 @@ export function FilterProductPage() {
           <>
             <div className='p-2 h-full flex flex-col justify-between gap-5 overflow-y-auto w-full box-border'>
               <div className='max-[450px]:grid-cols-1 max-[1000px]:grid-cols-2 max-xl:grid-cols-3 h-fit grid grid-cols-4 gap-4'>
-                {displayedProducts.map((product) => (
-                  <div
-                    key={product.id}
-                    className='p-4 border rounded shadow-md'
-                  >
-                    <img
-                      src={product.image}
-                      alt={product.title}
-                      className='w-full h-48 object-cover'
-                    />
-                    <h2 className='text-lg font-bold'>{product.title}</h2>
-                    <p className='text-gray-700'>${product.price}</p>
-                    <p className='text-gray-500 text-sm line-clamp-2'>
-                      {product.description}
-                    </p>
-                    <p className='text-gray-600 text-sm'>
-                      Brand: {product.brand}
-                    </p>
-                    <p className='text-gray-600 text-sm'>
-                      Model: {product.model}
-                    </p>
-                  </div>
+                {list.map((product) => (
+                  <ProductView
+                    Key={product}
+                    productDetails={{
+                      id: product._id,
+                      img: product.image,
+                      title: product.title,
+                      starCount: 1,
+                      price: product.price,
+                      latest: product.latest,
+                    }}
+                  />
                 ))}
               </div>
               <Pagination

@@ -11,14 +11,16 @@ import {
   navigationDrawerStateUpdate,
   setStateOfDialogBox,
 } from "@/redux/slice";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useRef } from "react";
 
 export function NavBar() {
   const { currentUser, navigationDrawerState } = useSelector(
     (state) => state.global
   );
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-  console.log(!currentUser);
+  const searchText = useRef("");
   return (
     <header>
       <nav className=' relative flex justify-between px-6 items-center py-2 gap-10 max-sm:gap-3'>
@@ -36,7 +38,13 @@ export function NavBar() {
         <h1 className=' max-sm:hidden'>Logo</h1>
         <div className=' flex-1'>
           <Input
+            ref={searchText}
+            onKeyDown={(e) => {
+              if (e.code === "Enter")
+                navigate(`/search/${searchText.current.value}`);
+            }}
             className=' focus-visible:border-gray-400'
+            type='text'
             placeholder='what are you looking for ? 🔎'
           />
         </div>

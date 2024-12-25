@@ -24,6 +24,14 @@ export const router = createBrowserRouter([
         loader: () => getDetails("/api/cart/all"),
         element: <FilterProductPage />,
       },
+      {
+        path: "search/:searchText",
+        loader: ({ params }) => {
+          const { searchText } = params; // Extract searchText from params
+          return getDetails(`/api/product/all?search=${searchText}`);
+        },
+        element: <FilterProductPage />,
+      },
     ],
   },
   {

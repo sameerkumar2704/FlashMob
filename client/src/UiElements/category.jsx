@@ -1,6 +1,4 @@
-import { memo, useEffect, useState } from "react";
-import { HiOutlineLightBulb } from "react-icons/hi2";
-import { PiShirtFoldedLight } from "react-icons/pi";
+import { memo, useEffect, useRef, useState } from "react";
 function CategoryOption({ category, children, setCategory, type }) {
   return (
     <button
@@ -14,27 +12,33 @@ function CategoryOption({ category, children, setCategory, type }) {
   );
 }
 export const Category = memo(function Category({ dataHandler }) {
+  const categories = useRef([
+    "all",
+    "laptop",
+    "appliances",
+    "gaming",
+    "tv",
+    "mobile",
+    "audio",
+  ]);
   const [category, setCategory] = useState("all");
   useEffect(() => {
     dataHandler(category);
   }, [category, dataHandler]);
 
   return (
-    <div className=' drop-shadow items-center  w-fit mx-auto border border-black/40 flex gap-3  py-1 px-2   rounded-md'>
-      <CategoryOption
-        type={"all"}
-        category={category}
-        setCategory={setCategory}
-      >
-        <h1>All</h1>
-      </CategoryOption>
-      <CategoryOption
-        type={"electronics"}
-        category={category}
-        setCategory={setCategory}
-      >
-        <h1>Electronics</h1>
-      </CategoryOption>
+    <div className=' max-sm:mx-3 drop-shadow items-center  w-fit flex-wrap mx-auto border border-black/40 flex gap-3  py-1 px-2   rounded-md'>
+      {categories.current.map((curr) => (
+        <>
+          <CategoryOption
+            type={curr}
+            category={category}
+            setCategory={setCategory}
+          >
+            <h1> {curr[0].toUpperCase() + curr.substring(1)}</h1>
+          </CategoryOption>
+        </>
+      ))}
     </div>
   );
 });
