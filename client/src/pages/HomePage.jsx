@@ -13,35 +13,26 @@ export function HomePage() {
   const [newProducts, setNewProducts] = useState([]);
   const dispatch = useDispatch();
 
-  const getAllProducts = useCallback(
-    async (category) => {
-      let url = `/api/product/all?limit=5&&products=other`;
-      if (category !== "all") url += `&category=${category}`;
-      const data = await getDetails(url);
-      setProducts(data.list || []);
-    },
-    []
-  );
+  const getAllProducts = useCallback(async (category) => {
+    let url = `/api/product/all?limit=5&&products=other`;
+    if (category !== "all") url += `&category=${category}`;
+    const data = await getDetails(url);
+    setProducts(data.list || []);
+  }, []);
 
-  const getDiscountedProducts = useCallback(
-    async (category) => {
-      let url = `/api/product/sale?limit=5`;
-      if (category !== "all") url += `&category=${category}`;
-      const data = await getDetails(url);
-      setDiscountedProducts(data.list || []);
-    },
-    []
-  );
+  const getDiscountedProducts = useCallback(async (category) => {
+    let url = `/api/product/sale?limit=5`;
+    if (category !== "all") url += `&category=${category}`;
+    const data = await getDetails(url);
+    setDiscountedProducts(data.list || []);
+  }, []);
 
-  const getNewProducts = useCallback(
-    async (category) => {
-      let url = `/api/product/new?limit=5`;
-      if (category !== "all") url += `&category=${category}`;
-      const data = await getDetails(url);
-      setNewProducts(data.list || []);
-    },
-    []
-  );
+  const getNewProducts = useCallback(async (category) => {
+    let url = `/api/product/new?limit=5`;
+    if (category !== "all") url += `&category=${category}`;
+    const data = await getDetails(url);
+    setNewProducts(data.list || []);
+  }, []);
 
   const LoadData = useCallback(
     (category) => {
@@ -51,12 +42,17 @@ export function HomePage() {
         getAllProducts(category),
         getDiscountedProducts(category),
         getNewProducts(category),
-      ])
-        .finally(() => {
-          dispatch(loadingState(false)); // Update Redux loading state
-        });
+      ]).finally(() => {
+        dispatch(loadingState(false)); // Update Redux loading state
+      });
     },
-    [dispatch, getAllProducts, getDiscountedProducts, getNewProducts]
+    [
+      dispatch,
+      getAllProducts,
+      getDiscountedProducts,
+      getNewProducts,
+      showLoader,
+    ]
   );
 
   useEffect(() => {
@@ -65,7 +61,7 @@ export function HomePage() {
 
   return (
     <>
-      <div className="h-full space-y-8 overflow-scroll scroll-smooth hide-scroll-bar">
+      <div className='h-full space-y-8 overflow-scroll scroll-smooth hide-scroll-bar'>
         <Category dataHandler={LoadData} />
         {newProducts.length > 0 && (
           <HorizontalView title={"New Products"} productList={newProducts} />
