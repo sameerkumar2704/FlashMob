@@ -146,3 +146,44 @@
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+
+/* silverscreen  */
+
+.fixed {
+  position: fixed;
+}
+
+.inset-0 {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.z-50 {
+  z-index: 50;
+}
+
+.bg-gray-800 {
+  background-color: #2d2d2d;
+}
+
+.bg-opacity-90 {
+  background-color: rgba(45, 45, 45, 0.9);
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ... */
