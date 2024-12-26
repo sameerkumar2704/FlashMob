@@ -21,15 +21,23 @@ export const router = createBrowserRouter([
       },
       {
         path: "filter-products/:type",
-        loader: ({ params }) =>
-          getDetails(`/api/product/${params.type}?limit=8&&page=1`),
+        loader: ({ params, request }) => {
+          const url = new URL(request.url); // To parse query params
+          const category = url.searchParams.get("category");
+          return getDetails(
+            `/api/product/${params.type}?limit=8&&page=1&&category=${category}`
+          );
+        },
         element: <FilterProductPage />,
       },
       {
         path: "search/:searchText",
         loader: ({ params }) => {
           const { searchText } = params; // Extract searchText from params
-          return getDetails(`/api/product/all?search=${searchText}`);
+
+          return getDetails(
+            `/api/product/all?search=${searchText}&&page=1&&limit=8`
+          );
         },
         element: <FilterProductPage />,
       },

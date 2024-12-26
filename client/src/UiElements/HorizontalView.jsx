@@ -1,12 +1,22 @@
 import { ComponentTitle } from "./ComponentTitle";
 import { ProductView } from "./ProductView";
 
-export function HorizontalView({ productList, title, viewAllLEndPoint }) {
+export function HorizontalView({
+  productList,
+  title,
+  viewAllLEndPoint,
+  categoryType,
+}) {
   console.log(productList);
   return (
     <div className=' p-4 space-y-4'>
       <ComponentTitle
-        endPoint={viewAllLEndPoint}
+        endPoint={
+          viewAllLEndPoint +
+          `?category=${
+            categoryType[0].toLowerCase() + categoryType.substring(1)
+          }`
+        }
         title={title}
         lessElements={productList.length < 5}
       />

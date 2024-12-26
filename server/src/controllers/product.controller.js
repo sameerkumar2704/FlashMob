@@ -26,7 +26,6 @@ const getAllProductList = asyncHandler(async (req, res) => {
   let regexPattern = words
     .map((word) => `\\b${escapeRegex(word)}\\b`)
     .join("|");
-  console.log(regexPattern);
   const excludeField = [
     "sort",
     "page",
@@ -46,15 +45,15 @@ const getAllProductList = asyncHandler(async (req, res) => {
   };
 
   let query = Product.find(constr);
-  if (req.query.products) {
-    console.log(constr);
-    query = query.where("onSale").exists(false);
-    query = query.where("createdAt").lte(currDate);
-  }
-  if (req.query.limit) {
-    query = query.limit(req.query.limit); // Ensure limit is a number
-  }
+  const sizeOfDocument = await Product.find(constr).countDocuments();
+  const limit = req.query?.limit ?? 1;
+  const currentPage = req.query?.page ?? 1;
 
+  const skip = (currentPage - 1) * (limit || 5);
+  query = query.skip(skip).limit(limit);
+  const maxPages = Math.ceil(sizeOfDocument / limit);
+
+  query = query.limit(limit);
   let product_list = await query;
   if (!product_list)
     throw new ApiError("Product Routes is Working Sorry ", 502);
@@ -62,6 +61,7 @@ const getAllProductList = asyncHandler(async (req, res) => {
     statu: "success",
     type: "all",
     list: product_list,
+    maxPages,
   });
 });
 
