@@ -9,23 +9,23 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   currentUserInstance,
   navigationDrawerStateUpdate,
-  setStateOfDialogBox
+  setStateOfDialogBox,
 } from "@/redux/slice";
 import { Link, useNavigate } from "react-router-dom";
 import { useRef } from "react";
 
 export function NavBar() {
   const { currentUser, navigationDrawerState } = useSelector(
-    state => state.global
+    (state) => state.global
   );
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const searchText = useRef("");
   return (
     <header>
-      <nav className=" relative flex justify-between px-6 items-center py-2 gap-10 max-sm:gap-3">
+      <nav className=' relative flex justify-between px-6 items-center py-2 gap-10 max-sm:gap-3'>
         <RxHamburgerMenu
-          onClick={e => {
+          onClick={(e) => {
             e.stopPropagation();
             dispatch(
               navigationDrawerStateUpdate(
@@ -33,13 +33,15 @@ export function NavBar() {
               )
             );
           }}
-          className=" max-sm:block hidden"
+          className=' max-sm:block hidden'
         />
-        <h1 className=" max-sm:hidden">Logo</h1>
-        <div className="flex-1">
+        <Link to={"/"} className=' max-sm:hidden'>
+          Logo
+        </Link>
+        <div className='flex-1'>
           <Input
             ref={searchText}
-            onKeyDown={e => {
+            onKeyDown={(e) => {
               if (e.code === "Enter") {
                 const query = searchText.current.value.trim(); // Trim whitespace
                 if (query) {
@@ -49,28 +51,28 @@ export function NavBar() {
                 }
               }
             }}
-            className="focus-visible:border-gray-400"
-            type="text"
-            placeholder="What are you looking for? 🔎"
+            className='focus-visible:border-gray-400'
+            type='text'
+            placeholder='What are you looking for? 🔎'
           />
         </div>
 
-        <ul className=" max-sm:hidden items-center flex gap-4 px-3">
+        <ul className=' max-sm:hidden items-center flex gap-4 px-3'>
           <li>
-            <MenuItem icon={<GoHeart className=" w-full h-full" />} />
+            <MenuItem icon={<GoHeart className=' w-full h-full' />} />
           </li>
           <Link to={"/cart"}>
             <MenuItem
-              icon={<PiShoppingCartLight className="w-full h-full" />}
+              icon={<PiShoppingCartLight className='w-full h-full' />}
             />
           </Link>
-          {currentUser !== undefined &&
-            <li className="  flex gap-2">
-              <div className=" p-1 border border-red-100  rounded-full  h-8 w-8">
-                <div className=" font-semibold  flex justify-center items-center rounded-full w-full h-full bg-red-100" />
+          {currentUser !== undefined && (
+            <li className='  flex gap-2'>
+              <div className=' p-1 border border-red-100  rounded-full  h-8 w-8'>
+                <div className=' font-semibold  flex justify-center items-center rounded-full w-full h-full bg-red-100' />
               </div>
               <Button
-                variant="primary"
+                variant='primary'
                 onClick={async () => {
                   await fetch("/api/users/logout");
                   dispatch(currentUserInstance(undefined));
@@ -79,16 +81,18 @@ export function NavBar() {
               >
                 Log out
               </Button>
-            </li>}
-          {currentUser === undefined &&
+            </li>
+          )}
+          {currentUser === undefined && (
             <li>
               <Button
-                variant="primary"
+                variant='primary'
                 onClick={() => dispatch(setStateOfDialogBox(true))}
               >
                 Sing up
               </Button>
-            </li>}
+            </li>
+          )}
         </ul>
         <NavDrawer />
       </nav>

@@ -69,7 +69,15 @@ const productsOnSale = asyncHandler(async (req, res) => {
   const excludeField = ["sort", "page", "limit", "fields", "products"];
   const queryObj = { ...req.query, onSale: true };
   excludeField.forEach((curr) => delete queryObj[curr]);
+
+  const sizeOfDocument = await Product.find(queryObj).countDocuments();
+  const limit = req.query?.limit ?? 1;
+  const currentPage = req.query?.page ?? 1;
   let query = Product.find(queryObj);
+  const skip = (currentPage - 1) * (limit || 5);
+  query = query.skip(skip).limit(limit);
+  const maxPages = Math.ceil(sizeOfDocument / limit);
+
   if (req.query.limit) {
     query = query.limit(req.query.limit); // Ensure limit is a number
   }
@@ -81,6 +89,7 @@ const productsOnSale = asyncHandler(async (req, res) => {
     statu: "success",
     type: "sale",
     list: products,
+    maxPages,
   });
 });
 
@@ -88,15 +97,23 @@ const newProductList = asyncHandler(async (req, res) => {
   const excludeField = ["sort", "page", "limit", "fields", "products"];
   const currDate = new Date();
   currDate.setDate(currDate.getDate() - 20);
-  const queryObj = { ...req.query }; // due to avoid pass by refrecnce we used spread
+  const queryObj = { ...req.query }; // to avoid pass by refrecnce we used spread
 
-  excludeField.forEach((curr) => delete queryObj[curr]);
+  excludeField.forEach((curr) => delete queryObj[curr]); // ["sort", "page", "limit", "fields", "products"]; excluding these fields
 
+  const sizeOfDocument = await Product.find(queryObj)
+
+    .where("createdAt")
+    .gt(currDate)
+    .countDocuments();
   let query = Product.find(queryObj).where("createdAt").gt(currDate);
 
-  if (req.query.limit) {
-    query = query.limit(req.query.limit); // Ensure limit is a number
-  }
+  const limit = req.query?.limit ?? 1;
+  const currentPage = req.query?.page ?? 1;
+
+  const skip = (currentPage - 1) * (limit || 5);
+  query = query.skip(skip).limit(limit);
+  const maxPages = Math.ceil(sizeOfDocument / limit);
 
   let products = await query;
 
@@ -106,6 +123,7 @@ const newProductList = asyncHandler(async (req, res) => {
     statu: "success",
     type: "new",
     list: products,
+    maxPages,
   });
 });
 export { getAllProductList, productsOnSale, newProductList };

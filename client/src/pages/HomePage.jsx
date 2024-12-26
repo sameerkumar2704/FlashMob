@@ -36,7 +36,6 @@ export function HomePage() {
 
   const LoadData = useCallback(
     (category) => {
-      showLoader(); // Show loader
       dispatch(loadingState(true)); // Optional: Redux state for loading
       Promise.all([
         getAllProducts(category),
@@ -46,34 +45,33 @@ export function HomePage() {
         dispatch(loadingState(false)); // Update Redux loading state
       });
     },
-    [
-      dispatch,
-      getAllProducts,
-      getDiscountedProducts,
-      getNewProducts,
-      showLoader,
-    ]
+    [dispatch, getAllProducts, getDiscountedProducts, getNewProducts]
   );
-
-  useEffect(() => {
-    LoadData("all"); // Load all products initially
-  }, [LoadData]);
 
   return (
     <>
       <div className='h-full space-y-8 overflow-scroll scroll-smooth hide-scroll-bar'>
         <Category dataHandler={LoadData} />
         {newProducts.length > 0 && (
-          <HorizontalView title={"New Products"} productList={newProducts} />
+          <HorizontalView
+            title={"New Products"}
+            viewAllLEndPoint='new'
+            productList={newProducts}
+          />
         )}
         {discountedProducts.length > 0 && (
           <HorizontalView
+            viewAllLEndPoint='sale'
             title={"Discounted Products"}
             productList={discountedProducts}
           />
         )}
         {products.length > 0 && (
-          <HorizontalView title={"Products"} productList={products} />
+          <HorizontalView
+            title={"Products"}
+            viewAllLEndPoint='other'
+            productList={products}
+          />
         )}
       </div>
     </>

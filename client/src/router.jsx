@@ -20,8 +20,9 @@ export const router = createBrowserRouter([
         element: <ProductDetails />,
       },
       {
-        path: "filter-products",
-        loader: () => getDetails("/api/cart/all"),
+        path: "filter-products/:type",
+        loader: ({ params }) =>
+          getDetails(`/api/product/${params.type}?limit=8&&page=1`),
         element: <FilterProductPage />,
       },
       {
