@@ -5,7 +5,7 @@ import { useLoaderData } from "react-router-dom";
 import { ProductView } from "../UiElements/ProductView";
 
 export function FilterProductPage() {
-  let productList = useLoaderData(); // data accroding routing call like cart list or view all products
+  let productList = useLoaderData();
   const [list, setList] = useState([]);
   const [products, setProducts] = useState([]);
   const [filters, setFilters] = useState({

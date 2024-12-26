@@ -5,9 +5,7 @@ import { Product } from "../models/product.model.js";
 
 export const addElementInCart = asyncHandler(async (req, res) => {
   const { user, product_item } = req.body;
-
   const user_cart = await Cart.findOne({ user: user });
-
   if (!user_cart) {
     const new_data = {
       user,
@@ -78,7 +76,6 @@ export const cartItemList = asyncHandler(async (req, res) => {
     })
   );
 
-  console.log(productsInCart);
   return res.json({
     status: "success",
     type: "cart",
