@@ -2,6 +2,7 @@ import express from "express";
 import {
   forgotPassword,
   getCurrentUser,
+  getUserDetails,
   loginUser,
   logoutUser,
   refreshAcessToken,
@@ -11,6 +12,7 @@ import {
 import { verifyToken } from "../middelwares/user.middelware.js";
 
 const userRoute = express.Router();
+userRoute.route("/").get(verifyToken, getUserDetails);
 userRoute.route("/register").post(registerUser);
 userRoute.route("/login").post(loginUser);
 userRoute.route("/currentUser").get(verifyToken, getCurrentUser);

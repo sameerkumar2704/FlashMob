@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ProductFilter } from "../components/ProductFilter";
 import { Pagination } from "../components/Pagination";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useLocation } from "react-router-dom";
 import { ProductView } from "../UiElements/ProductView";
 
 export function FilterProductPage() {
@@ -12,6 +12,8 @@ export function FilterProductPage() {
     category: "",
     priceRange: Infinity,
   });
+  const currentLocation = useLocation();
+  console.log(currentLocation);
   const [maxPrice, setMaxPrice] = useState(Infinity);
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage, setProductsPerPage] = useState(6);
@@ -98,33 +100,39 @@ export function FilterProductPage() {
 
   return (
     <div className='flex overflow-hidden'>
-      {isSidebarOpen && (
-        <div
-          className='fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden'
-          onClick={() => setIsSidebarOpen(false)}
-        ></div>
+      {currentLocation.pathname.match("/search/") && (
+        <>
+          {isSidebarOpen && (
+            <div
+              className='fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden'
+              onClick={() => setIsSidebarOpen(false)}
+            ></div>
+          )}
+          <div
+            className={`fixed top-0 left-0 h-full z-20 bg-white px-4 py-6 transform ${
+              isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+            } transition-transform duration-300 md:static md:translate-x-0`}
+          >
+            <ProductFilter
+              onFilterChange={handleFilterChange}
+              maxPrice={maxPrice}
+              categories={categories}
+              currentPriceRange={filters.priceRange}
+            />
+          </div>
+        </>
       )}
-      <div
-        className={`fixed top-0 left-0 h-full z-20 bg-white px-4 py-6 transform ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 md:static md:translate-x-0`}
-      >
-        <ProductFilter
-          onFilterChange={handleFilterChange}
-          maxPrice={maxPrice}
-          categories={categories}
-          currentPriceRange={filters.priceRange}
-        />
-      </div>
 
       {/* Main Content */}
       <div className='flex-1 flex flex-col px-4 py-2 relative'>
-        <button
-          className='block md:hidden bg-red-500 text-white px-4 py-2 rounded shadow-md mb-4'
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        >
-          Filter
-        </button>
+        {currentLocation.pathname.match("/search/") && (
+          <button
+            className='block md:hidden bg-red-500 text-white px-4 py-2 rounded shadow-md mb-4'
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          >
+            Filter
+          </button>
+        )}
 
         {loading ? (
           <div className='flex justify-center items-center flex-1'>
@@ -136,7 +144,7 @@ export function FilterProductPage() {
               <div className='max-[450px]:grid-cols-1 max-[1000px]:grid-cols-2 max-xl:grid-cols-3 h-fit grid grid-cols-4 gap-4'>
                 {list.map((product) => (
                   <ProductView
-                    Key={product}
+                    Key={product._id}
                     productDetails={{
                       id: product._id,
                       img: product.image,

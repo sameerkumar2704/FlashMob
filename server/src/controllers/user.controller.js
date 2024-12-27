@@ -57,12 +57,19 @@ const loginUser = asyncHandler(async (req, res, next) => {
 });
 
 const getCurrentUser = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user._id).select(
-    "-password -createdAt -updatedAt"
-  );
+  const user = await User.findById(req.user._id).select("username _id");
   res.json({
     status: "sucess",
     detail: JSON.stringify(user),
+  });
+});
+const getUserDetails = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user._id).select(
+    "username phonenumber email "
+  );
+  res.json({
+    status: "sucess",
+    detail: user,
   });
 });
 const resetPassword = asyncHandler(async (req, res) => {
@@ -182,4 +189,5 @@ export {
   refreshAcessToken,
   forgotPassword,
   resetPassword,
+  getUserDetails,
 };

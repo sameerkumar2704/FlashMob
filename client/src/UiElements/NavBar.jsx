@@ -67,10 +67,15 @@ export function NavBar() {
             />
           </Link>
           {currentUser !== undefined && (
-            <li className='  flex gap-2'>
-              <div className=' p-1 border border-red-100  rounded-full  h-8 w-8'>
-                <div className=' font-semibold  flex justify-center items-center rounded-full w-full h-full bg-red-100' />
-              </div>
+            <li className=' items-center  flex gap-2'>
+              <Link
+                to={"/profile"}
+                className=' font-semibold text-2xl w-9 h-9 flex justify-center rounded-full items-center  bg-red-100'
+              >
+                <h1 className=' h-full inline-block text-center'>
+                  {currentUser.username[0]}
+                </h1>
+              </Link>
               <Button
                 variant='primary'
                 onClick={async () => {
