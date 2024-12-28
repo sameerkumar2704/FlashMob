@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import {
   currentUserInstance,
+  setDialogPage,
   setStateOfDialogBox,
   setToastMessage,
 } from "@/redux/slice";
@@ -24,9 +25,8 @@ const useNotificiationContext = () => {
 const NotificationBox = ({ title, children }) => {
   const { showDialogBox } = useSelector((state) => state.global);
   const dispatch = useDispatch();
-  const [page, setPage] = useState(title);
+  const { page } = useSelector((state) => state.global);
   const [animate, setAnimate] = useState(false);
-  console.log("dialog" + showDialogBox);
   useEffect(() => {
     setAnimate(false);
   }, [showDialogBox]);
@@ -39,8 +39,6 @@ const NotificationBox = ({ title, children }) => {
         title,
         children,
         setAnimate,
-        page,
-        setPage,
       }}
     >
       <div
@@ -60,7 +58,7 @@ const NotificationBox = ({ title, children }) => {
               className=' w-6 h-6  mr-auto'
             />
             <span className=' mr-auto text-sm font-semibold tracking-wider'>
-              {title}
+              {page}
             </span>
           </div>
 
@@ -72,7 +70,8 @@ const NotificationBox = ({ title, children }) => {
 };
 const RegistaionForm = () => {
   const dispatch = useDispatch();
-  const { isOutline, setAnimate, page, setPage } = useNotificiationContext();
+  const { isOutline, setAnimate } = useNotificiationContext();
+  const { page } = useSelector((state) => state.global);
   const userName = useRef();
   const email = useRef();
   const password = useRef();
@@ -129,7 +128,7 @@ const RegistaionForm = () => {
           <span> Already have account ? </span>
 
           <button
-            onClick={() => setPage("Log In")}
+            onClick={() => dispatch(setDialogPage("log in"))}
             className=' text-gray-600 mx-4'
           >
             sign in
@@ -141,7 +140,8 @@ const RegistaionForm = () => {
 };
 const LoginInForm = () => {
   const dispatch = useDispatch();
-  const { isOutline, setAnimate, page, setPage } = useNotificiationContext();
+  const { isOutline, setAnimate } = useNotificiationContext();
+  const { page } = useSelector((state) => state.global);
 
   const email = useRef();
   const password = useRef();
@@ -194,7 +194,7 @@ const LoginInForm = () => {
           <span> Already have account ? </span>
 
           <button
-            onClick={() => setPage("Registration")}
+            onClick={() => dispatch(setDialogPage("registration"))}
             className=' text-gray-600 mx-4'
           >
             Create New Account
@@ -204,6 +204,51 @@ const LoginInForm = () => {
     </div>
   );
 };
+const AddNewAddress = () => {
+  const { page } = useSelector((state) => state.global);
+  const zipcode = useRef();
+  const city = useRef();
+  const state = useRef();
+  const street = useRef();
+  const houeNo = useRef();
+  const dispatch = useDispatch();
+  const toast = useToast();
+  const { isOutline, setAnimate } = useNotificiationContext();
+  if (page.toLowerCase() !== "new address") return;
+  return (
+    <form className=' p-4 flex flex-col gap-4'>
+      <Input ref={houeNo} placeholder='House No' />
+      <Input ref={street} placeholder='Street Address' />
+      <Input ref={city} placeholder='City' />
+      <Input ref={state} placeholder='State' />
+      <Input ref={zipcode} placeholder='Zipcode' />
+      <Button
+        onClick={asyncHandler(async () => {
+          // let userDetail = await postDetails("/api/users/login", obj);
+          // if (userDetail.status === "failed")
+          //   throw new Error(userDetail.message);
+          const resp = await postDetails("/api/address/add", {
+            houseNo: houeNo.current.value,
+            zipcode: zipcode.current.value,
+            street: street.current.value,
+            state: state.current.value,
+            city: city.current.value,
+          });
+          setAnimate(true);
+          setTimeout(() => {
+            dispatch(setStateOfDialogBox(false));
+          }, 200);
+          dispatch(setToastMessage("Login Completed"));
+        }, toast)}
+        className={` mt-10 py-2  w-full hover:bg-red-500/90 
+          ${isOutline ? "border border-red-500" : "bg-red-500"}`}
+      >
+        Add Address
+      </Button>
+    </form>
+  );
+};
 NotificationBox.Registration = RegistaionForm;
 NotificationBox.Login = LoginInForm;
+NotificationBox.AddNewAddress = AddNewAddress;
 export { NotificationBox };

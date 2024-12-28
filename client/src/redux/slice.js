@@ -21,6 +21,7 @@ const intialState = {
   newProductOnSite: [],
   cartList: [],
   toastMessage: undefined,
+  page: "registration",
 };
 
 // it consits of action fuction to set values
@@ -47,6 +48,9 @@ const globalSlice = createSlice({
     setToastMessage: (state, action) => {
       state.toastMessage = action.payload;
     },
+    setDialogPage: (state, action) => {
+      state.page = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -69,5 +73,6 @@ export const {
   currentUserInstance,
   navigationDrawerStateUpdate,
   setToastMessage,
+  setDialogPage,
 } = globalSlice.actions;
 export default globalSlice.reducer;

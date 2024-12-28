@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { HomePage } from "./pages/HomePage";
 import { LandingPage } from "./pages/landingPage";
 import ProductDetails from "./pages/ProductDetails";
@@ -6,7 +6,7 @@ import { FilterProductPage } from "./pages/FilterProductPage";
 import { getDetails } from "./util/fetchHandlers";
 import { ForgotPassword } from "./pages/ForgotPassword";
 import { ProfilePage } from "./pages/ProfilePage";
-import { useSelector } from "react-redux";
+import { globalStore } from "./redux/store";
 
 export const router = createBrowserRouter([
   {
@@ -47,8 +47,12 @@ export const router = createBrowserRouter([
       {
         path: "profile",
         loader: () => {
+          const state = globalStore.getState();
+          if (!state.global.currentUser)
+            throw new Response("", { status: 302, headers: { Location: "/" } });
           return getDetails("/api/users/");
         },
+
         element: <ProfilePage />,
       },
 

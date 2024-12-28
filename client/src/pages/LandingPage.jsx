@@ -1,9 +1,7 @@
 import { Toaster } from "@/components/ui/toaster";
-import { getAllProducts } from "@/redux/slice";
 import { NavBar } from "@/UiElements/NavBar";
 import { NotificationBox } from "@/UiElements/NotificationDialog";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 
 export function LandingPage() {
@@ -23,6 +21,7 @@ export function LandingPage() {
           <NotificationBox title='Registration'>
             <NotificationBox.Registration />
             <NotificationBox.Login />
+            <NotificationBox.AddNewAddress />
           </NotificationBox>
           <Toaster />
         </>

@@ -15,6 +15,7 @@ export async function postDetails(url, body) {
     headers: { "Content-Type": "application/json" },
     credentials: "include",
   });
-  const result = await res.json();
+  if (res.status === 304) return { status: 304 };
+  const result = await res?.json();
   return result;
 }

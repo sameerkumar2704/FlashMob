@@ -4,8 +4,7 @@ import cookieParser from "cookie-parser";
 import { errorController } from "./controllers/error.controller.js";
 import { productRoute } from "./routes/product.routes.js";
 import { cartRouter } from "./routes/cart.routes.js";
-
-import { verifyToken } from "./middelwares/user.middelware.js";
+import { addressRouter } from "./routes/address.routes.js";
 const app = express();
 
 app.use("/", (_, res, next) => {
@@ -23,5 +22,6 @@ app.use(cookieParser());
 app.use("/users", userRoute);
 app.use("/product", productRoute);
 app.use("/cart", cartRouter);
+app.use("/address", addressRouter);
 app.use(errorController);
 export { app };

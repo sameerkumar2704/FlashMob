@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   currentUserInstance,
   navigationDrawerStateUpdate,
+  setDialogPage,
   setStateOfDialogBox,
 } from "@/redux/slice";
 import { Link, useNavigate } from "react-router-dom";
@@ -81,7 +82,9 @@ export function NavBar() {
                 onClick={async () => {
                   await fetch("/api/users/logout");
                   dispatch(currentUserInstance(undefined));
+                  dispatch(setDialogPage("registration"));
                   dispatch(setStateOfDialogBox(true));
+                  navigate("/");
                 }}
               >
                 Log out

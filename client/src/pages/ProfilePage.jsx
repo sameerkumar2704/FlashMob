@@ -1,36 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Package, Plus, Edit2, Trash2 } from "lucide-react";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
+import { setDialogPage, setStateOfDialogBox } from "@/redux/slice";
+import { useDispatch } from "react-redux";
+import { getDetails, postDetails } from "@/util/fetchHandlers";
+import { asyncHandler } from "@/util/asynHandler";
+import { useToast } from "@/hooks/use-toast";
 
 const ProfilePage = () => {
   const { detail } = useLoaderData();
+
+  const dispatch = useDispatch();
+  const { toast } = useToast();
+  const [refetch, setRefetch] = useState(false);
   // ... Previous state management code remains the same ...
+
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState(null);
-  const [addresses, setAddresses] = useState([
-    {
-      id: 1,
-      type: "Home",
-      street: "123 Main St",
-      apt: "Apt 4B",
-      city: "New York",
-      state: "NY",
-      zip: "10001",
-      isDefault: true,
-    },
-    {
-      id: 2,
-      type: "Office",
-      street: "456 Business Ave",
-      apt: "Suite 200",
-      city: "New York",
-      state: "NY",
-      zip: "10002",
-      isDefault: false,
-    },
-  ]);
+  const [addresses, setAddresses] = useState([]);
 
   const [formData, setFormData] = useState({
     type: "",
@@ -51,25 +40,16 @@ const ProfilePage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = asyncHandler(async (e) => {
     e.preventDefault();
-    if (editingAddressId) {
-      setAddresses(
-        addresses.map((addr) =>
-          addr.id === editingAddressId
-            ? { ...formData, id: editingAddressId }
-            : addr
-        )
-      );
-    } else {
-      const newAddress = {
-        ...formData,
-        id: addresses.length + 1,
-      };
-      setAddresses([...addresses, newAddress]);
+    const res = await postDetails("/api/address/", formData);
+    if (res.status === 304) {
+      throw new Error("No Update in Address");
     }
+    setRefetch((curr) => !curr);
+
     resetForm();
-  };
+  }, toast);
 
   const handleEdit = (address) => {
     setFormData(address);
@@ -95,14 +75,21 @@ const ProfilePage = () => {
     setShowAddressForm(false);
   };
 
-  const setDefaultAddress = (id) => {
-    setAddresses(
-      addresses.map((addr) => ({
-        ...addr,
-        isDefault: addr.id === id,
-      }))
-    );
+  const setDefaultAddress = async (formData) => {
+    const res = await postDetails("/api/address/", formData);
+    if (res.status === 304) {
+      throw new Error("No Update in Address");
+    }
+    setRefetch((curr) => !curr);
   };
+
+  useEffect(() => {
+    async function getAddressList() {
+      const res = await getDetails("/api/address/");
+      setAddresses(res.list.address);
+    }
+    getAddressList();
+  }, [refetch]);
 
   return (
     <div className=' flex flex-col items-center p-4 space-y-6'>
@@ -140,18 +127,16 @@ const ProfilePage = () => {
             <Button
               className='bg-red-600 hover:bg-red-700 text-white'
               onClick={() => {
-                setShowAddressForm(!showAddressForm);
-                setEditingAddressId(null);
-                resetForm();
+                dispatch(setStateOfDialogBox(true));
+                dispatch(setDialogPage("New Address"));
               }}
             >
-              <Plus className='w-4 h-4 mr-2' />
               Add New Address
             </Button>
           </CardHeader>
           <CardContent className='space-y-4 o'>
             {/* Address List */}
-            <div className='space-y-4'>
+            <div className='space-y-4 w-96'>
               {addresses.map((address) => (
                 <div
                   key={address.id}
@@ -165,7 +150,7 @@ const ProfilePage = () => {
                     <div className='space-y-1'>
                       <div className='flex items-center gap-2'>
                         <span className='font-medium text-red-900'>
-                          {address.type}
+                          {address.houseNo}
                         </span>
                         {address.isDefault && (
                           <span className='text-xs bg-red-100 text-red-800 px-2 py-1 rounded'>
@@ -174,8 +159,9 @@ const ProfilePage = () => {
                         )}
                       </div>
                       <p>{address.street}</p>
-                      {address.apt && <p>{address.apt}</p>}
-                      <p>{`${address.city}, ${address.state} ${address.zip}`}</p>
+
+                      {address.houseNo && <p>{address.houseNO}</p>}
+                      <p>{`${address.city}, ${address.state} ${address.zipcode}`}</p>
                     </div>
                     <div className='flex gap-2'>
                       <Button
@@ -192,7 +178,9 @@ const ProfilePage = () => {
                             variant='ghost'
                             size='sm'
                             className='text-red-600 hover:text-red-700 hover:bg-red-100'
-                            onClick={() => setDefaultAddress(address.id)}
+                            onClick={() =>
+                              setDefaultAddress({ ...address, isDefault: true })
+                            }
                           >
                             Set Default
                           </Button>
@@ -222,17 +210,6 @@ const ProfilePage = () => {
                   <div className='col-span-2'>
                     <input
                       type='text'
-                      name='type'
-                      placeholder='Address Type (e.g., Home, Office)'
-                      value={formData.type}
-                      onChange={handleInputChange}
-                      className='w-full p-2 border border-red-200 rounded focus:ring-red-500 focus:border-red-500'
-                      required
-                    />
-                  </div>
-                  <div className='col-span-2'>
-                    <input
-                      type='text'
                       name='street'
                       placeholder='Street Address'
                       value={formData.street}
@@ -245,7 +222,7 @@ const ProfilePage = () => {
                     type='text'
                     name='apt'
                     placeholder='Apt/Suite (optional)'
-                    value={formData.apt}
+                    value={formData.houseNo}
                     onChange={handleInputChange}
                     className='w-full p-2 border border-red-200 rounded focus:ring-red-500 focus:border-red-500'
                   />
@@ -271,7 +248,7 @@ const ProfilePage = () => {
                     type='text'
                     name='zip'
                     placeholder='ZIP Code'
-                    value={formData.zip}
+                    value={formData.zipcode}
                     onChange={handleInputChange}
                     className='w-full p-2 border border-red-200 rounded focus:ring-red-500 focus:border-red-500'
                     required
