@@ -59,10 +59,25 @@ export function NavBar() {
         </div>
 
         <ul className=' max-sm:hidden items-center flex gap-4 px-3'>
-          <li>
+          <li
+            onClick={() => {
+              if (currentUser === undefined) {
+                dispatch(setDialogPage("registration"));
+                dispatch(setStateOfDialogBox(true));
+              }
+            }}
+          >
             <MenuItem icon={<GoHeart className=' w-full h-full' />} />
           </li>
-          <Link to={"/cart"}>
+          <Link
+            onClick={() => {
+              if (currentUser === undefined) {
+                dispatch(setDialogPage("registration"));
+                dispatch(setStateOfDialogBox(true));
+              }
+            }}
+            to={"/cart"}
+          >
             <MenuItem
               icon={<PiShoppingCartLight className='w-full h-full' />}
             />

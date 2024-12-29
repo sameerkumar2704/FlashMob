@@ -7,6 +7,9 @@ import { getDetails } from "./util/fetchHandlers";
 import { ForgotPassword } from "./pages/ForgotPassword";
 import { ProfilePage } from "./pages/ProfilePage";
 import { globalStore } from "./redux/store";
+import ShoppingCart from "./pages/ShoppingCart";
+import { ViewAllPage } from "./pages/ViewAllPage";
+import ShoppingCheckout from "./pages/ShoppingCheckout";
 
 export const router = createBrowserRouter([
   {
@@ -23,24 +26,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "filter-products/:type",
-        loader: ({ params, request }) => {
-          const url = new URL(request.url); // To parse query params
-          const category = url.searchParams.get("category");
-          return getDetails(
-            `/api/product/${params.type}?limit=16&&page=1&&category=${category}`
-          );
-        },
-        element: <FilterProductPage />,
+        element: <ViewAllPage />,
       },
       {
         path: "search/:searchText",
-        loader: ({ params }) => {
-          const { searchText } = params; // Extract searchText from params
 
-          return getDetails(
-            `/api/product/all?search=${searchText}&&page=1&&limit=16`
-          );
-        },
         element: <FilterProductPage />,
       },
 
@@ -58,8 +48,17 @@ export const router = createBrowserRouter([
 
       {
         path: "cart",
-        loader: () => getDetails("/api/cart/all"),
-        element: <FilterProductPage />,
+        loader: () => {
+          const state = globalStore.getState();
+          if (!state.global.currentUser)
+            throw new Response("", { status: 302, headers: { Location: "/" } });
+          return getDetails("/api/cart/all");
+        },
+        element: <ShoppingCart />,
+      },
+      {
+        path: "/checkOut",
+        element: <ShoppingCheckout />,
       },
     ],
   },

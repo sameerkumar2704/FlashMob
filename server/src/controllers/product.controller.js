@@ -6,7 +6,6 @@ import { ApiError, asyncHandler } from "../util/aysncHandler.js";
 export const prdouctDetails = asyncHandler(async (req, res) => {
   let { productId } = req.query;
   if (!mongoose.Types.ObjectId.isValid(productId)) {
-    console.log("Bad Request");
     throw new ApiError("Invalid product ID", 400); // Bad Request
   }
 
@@ -21,6 +20,7 @@ export const prdouctDetails = asyncHandler(async (req, res) => {
 
 const getAllProductList = asyncHandler(async (req, res) => {
   let searchQuery = req.query.search || "";
+  const maxPrice = req.query.maxPrice ? Number(req.query.maxPrice) : Infinity;
   let words = searchQuery.split(" ");
   const escapeRegex = (word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   let regexPattern = words
@@ -33,16 +33,32 @@ const getAllProductList = asyncHandler(async (req, res) => {
     "fields",
     "products",
     "search",
+    "maxPrice",
   ];
   const currDate = new Date();
   currDate.setDate(currDate.getDate() - 20);
   const queryObj = { ...req.query }; // due to avoid pass by refrecnce we used spread
 
   excludeField.forEach((curr) => delete queryObj[curr]);
+
   const constr = {
     ...queryObj,
     title: { $regex: regexPattern, $options: "i" },
+    price: { $lte: maxPrice },
   };
+
+  let max_min_price = await Product.aggregate([
+    { $match: { title: { $regex: regexPattern, $options: "i" } } },
+
+    // Group to calculate max and min prices
+    {
+      $group: {
+        _id: null,
+        maxPrice: { $max: "$price" },
+        minPrice: { $min: "$price" },
+      },
+    },
+  ]);
 
   let query = Product.find(constr);
   const sizeOfDocument = await Product.find(constr).countDocuments();
@@ -55,6 +71,7 @@ const getAllProductList = asyncHandler(async (req, res) => {
 
   query = query.limit(limit);
   let product_list = await query;
+  console.log(product_list);
   if (!product_list)
     throw new ApiError("Product Routes is Working Sorry ", 502);
   res.status(200).send({
@@ -62,6 +79,10 @@ const getAllProductList = asyncHandler(async (req, res) => {
     type: "all",
     list: product_list,
     maxPages,
+    maxPrice:
+      max_min_price.length > 0 ? max_min_price[0].maxPrice : Number.MAX_VALUE,
+    minPrice:
+      max_min_price.length > 0 ? max_min_price[0].minPrice : Number.MIN_VALUE,
   });
 });
 

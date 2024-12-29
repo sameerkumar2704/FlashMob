@@ -11,4 +11,5 @@ addressRouter
   .route("/")
   .get(verifyToken, getAddress)
   .post(verifyToken, updateAddress);
+
 export { addressRouter };

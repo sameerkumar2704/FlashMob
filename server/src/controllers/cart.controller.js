@@ -4,7 +4,8 @@ import { ApiError, asyncHandler } from "../util/aysncHandler.js";
 import { Product } from "../models/product.model.js";
 
 export const addElementInCart = asyncHandler(async (req, res) => {
-  const { user, product_item } = req.body;
+  const user = req.user;
+  const { product_item, quantity } = req.body;
   const user_cart = await Cart.findOne({ user: user });
   if (!user_cart) {
     const new_data = {
@@ -22,12 +23,21 @@ export const addElementInCart = asyncHandler(async (req, res) => {
       product_list: { $elemMatch: { product: product_item } }, // Check if product_item exists in product_list
     });
     if (prodcutPresentIncart) {
-      await Cart.updateOne(
-        { user: user, "product_list.product": product_item }, // Find the cart for the user and check for the product
-        {
-          $inc: { "product_list.$.quantity": 1 }, // Increment the quantity if product is found
-        }
-      );
+      if (req.body?.quantity) {
+        await Cart.updateOne(
+          { user: user, "product_list.product": product_item },
+          {
+            $set: { "product_list.$.quantity": req.body.quantity },
+          }
+        );
+      } else {
+        await Cart.updateOne(
+          { user: user, "product_list.product": product_item }, // Find the cart for the user and check for the product
+          {
+            $inc: { "product_list.$.quantity": req.body.increaseQuantity }, // Increment the quantity if product is found
+          }
+        );
+      }
     } else {
       await Cart.updateOne(
         { user },
@@ -81,4 +91,22 @@ export const cartItemList = asyncHandler(async (req, res) => {
     type: "cart",
     list: productsInCart,
   });
+});
+
+export const deleteItemFromCart = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const productId = req.query.productId;
+
+  const result = await Cart.updateOne(
+    {
+      user, // Match the user
+      "product_list.product": productId, // Match product within the array
+    },
+    {
+      $pull: { product_list: { product: productId } }, // Remove the specific product from the array
+    }
+  );
+  return res
+    .status(200)
+    .json({ status: "sucess", messsage: "item removed from cart" });
 });

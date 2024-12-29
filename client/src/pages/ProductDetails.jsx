@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { GoHeart } from "react-icons/go";
 import { MdOutlineLocalShipping, MdVerified } from "react-icons/md";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { getDetails, postDetails } from "@/util/fetchHandlers";
 import { useDispatch, useSelector } from "react-redux";
 import { asyncHandler } from "@/util/asynHandler";
 import { toast } from "@/hooks/use-toast";
 import { setStateOfDialogBox } from "@/redux/slice";
+import { Button } from "@/components/ui/button";
 
 function ProductDetails() {
   const { productId } = useParams();
@@ -18,6 +19,7 @@ function ProductDetails() {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const { currentUser } = useSelector((state) => state.global);
   const dispatch = useDispatch();
+
   useEffect(() => {
     asyncHandler(async () => {
       const res = await getDetails(
@@ -43,9 +45,6 @@ function ProductDetails() {
     })();
   }, [currentUser, currentUser?._id, productDetails, quantity]);
 
-  const incrementQuantity = () => setQuantity((prev) => Math.min(prev + 1, 10));
-  const decrementQuantity = () => setQuantity((prev) => Math.max(prev - 1, 1));
-
   const handleAddToCart = async () => {
     if (!currentUser) {
       dispatch(setStateOfDialogBox(true));
@@ -56,7 +55,7 @@ function ProductDetails() {
       await postDetails("http://localhost:8080/cart/add", {
         user: currentUser?._id,
         product_item: productDetails._id,
-        quantity: quantity,
+        increaseQuantity: quantity,
       });
       setPresentInCart(true);
       setCartQuantity(quantity);
@@ -64,6 +63,14 @@ function ProductDetails() {
       console.error("Error adding to cart:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleQuantityChange = (type) => {
+    if (type === "increment" && quantity < 99) {
+      setQuantity((prev) => prev + 1);
+    } else if (type === "decrement" && quantity > 1) {
+      setQuantity((prev) => prev - 1);
     }
   };
 
@@ -189,45 +196,45 @@ function ProductDetails() {
                 )}
               </div>
 
-              <div className='space-y-4'>
-                <div className='flex flex-col sm:flex-row items-stretch gap-4'>
-                  <div className='flex items-center justify-center border border-gray-300 rounded-xl bg-white'>
-                    <button
-                      onClick={decrementQuantity}
-                      className='px-4 py-3 text-gray-600 hover:bg-gray-100 transition-colors rounded-l-xl'
-                    >
-                      -
-                    </button>
-                    <span className='w-16 text-center py-3 border-x text-gray-900 font-medium'>
+              {/* Custom Quantity Selector */}
+              <div className='flex items-center gap-4'>
+                <span className='text-sm font-medium text-gray-700'>
+                  Quantity:
+                </span>
+                <div className='flex items-center bg-white border border-gray-300 rounded-lg overflow-hidden'>
+                  <button
+                    onClick={() => handleQuantityChange("decrement")}
+                    className='px-4 py-2 text-gray-600 hover:bg-gray-100 focus:outline-none active:bg-gray-200 transition-colors duration-200'
+                  >
+                    <span className='text-lg font-medium'>−</span>
+                  </button>
+                  <div className='w-16 flex items-center justify-center border-x border-gray-300'>
+                    <span className='text-gray-900 font-medium'>
                       {quantity}
                     </span>
-                    <button
-                      onClick={incrementQuantity}
-                      className='px-4 py-3 text-gray-600 hover:bg-gray-100 transition-colors rounded-r-xl'
-                    >
-                      +
-                    </button>
                   </div>
+                  <button
+                    onClick={() => handleQuantityChange("increment")}
+                    className='px-4 py-2 text-gray-600 hover:bg-gray-100 focus:outline-none active:bg-gray-200 transition-colors duration-200'
+                  >
+                    <span className='text-lg font-medium'>+</span>
+                  </button>
+                </div>
+              </div>
 
+              <div className='space-y-4'>
+                <div className='flex flex-col sm:flex-row items-stretch justify-center gap-4'>
                   <button
                     onClick={handleAddToCart}
                     disabled={isLoading}
                     className={`flex-1 px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-[1.02] 
                       ${
-                        presentInCart
-                          ? "bg-green-500"
-                          : isLoading
+                        isLoading
                           ? "bg-red-400 cursor-wait"
                           : "bg-red-500 hover:bg-red-600 active:bg-red-700 shadow-lg hover:shadow-xl"
                       } text-white`}
                   >
-                    {isLoading
-                      ? "Adding..."
-                      : presentInCart
-                      ? `${cartQuantity} ${
-                          cartQuantity === 1 ? "Item" : "Items"
-                        } in Cart`
-                      : "Add to Cart"}
+                    {isLoading ? "Adding..." : `Add to Cart (${quantity})`}
                   </button>
 
                   <button
@@ -237,6 +244,13 @@ function ProductDetails() {
                     <GoHeart size={24} />
                   </button>
                 </div>
+                <Link
+                  to={`/checkOut?type=product&&productId=${productId}&&quantity=${quantity}`}
+                >
+                  <Button className='bg-green-600 w-full sm:w-[50%]'>
+                    Buy Now
+                  </Button>
+                </Link>
               </div>
 
               <div className='bg-gray-100 rounded-xl p-4'>

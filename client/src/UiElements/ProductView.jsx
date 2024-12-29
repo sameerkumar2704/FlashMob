@@ -6,7 +6,7 @@ export function ProductView({ productDetails }) {
 
   // const [faviourate, setAsFaviourate] = useState(productDetails.faviourate);
   // const { setItemList } = useCartContext();
-  console.log(productDetails);
+
   return (
     <div
       onClick={() => navigator(`/product/${productDetails.id}`)}
@@ -30,7 +30,6 @@ export function ProductView({ productDetails }) {
             {productDetails.title}
           </h1>
           <h1 className=' text-red-500'>₹.{productDetails.price}</h1>
-          <RatingComponents ratingCount={productDetails.starCount} />
         </>
       )}
     </div>

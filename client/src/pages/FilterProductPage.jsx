@@ -1,102 +1,96 @@
 import { useState, useEffect } from "react";
 import { ProductFilter } from "../components/ProductFilter";
 import { Pagination } from "../components/Pagination";
-import { useLoaderData, useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { ProductView } from "../UiElements/ProductView";
+import { getDetails } from "@/util/fetchHandlers";
 
 export function FilterProductPage() {
-  let productList = useLoaderData();
-  const [list, setList] = useState([]);
-  const [products, setProducts] = useState([]);
+  const listType = useParams();
+  const [list, setList] = useState({});
+
   const [filters, setFilters] = useState({
     category: "",
     priceRange: Infinity,
   });
   const currentLocation = useLocation();
-  console.log(currentLocation);
   const [maxPrice, setMaxPrice] = useState(Infinity);
+  const [maxPage, setMaxPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [productsPerPage, setProductsPerPage] = useState(6);
+
+  const [start, setStartPage] = useState(1);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [pageArray, setPageArray] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const categories = ["tv", "gaming", "audio", "mobile"];
-  useEffect(() => {
-    setList(productList.list);
-  }, [productList]);
   // Fetch products data
   useEffect(() => {
-    setLoading(true);
-    Promise.all(
-      categories.map((category) =>
-        fetch(`https://fakestoreapi.in/api/products/category?type=${category}`)
-          .then((res) => res.json())
-          .then((data) => (data.status === "SUCCESS" ? data.products : []))
-      )
-    )
-      .then((results) => {
-        const combinedProducts = results.flat().slice(0, 60);
-        setProducts(combinedProducts);
-        const maxFetchedPrice = Math.max(
-          ...combinedProducts.map((p) => p.price)
-        );
-        setMaxPrice(maxFetchedPrice); // Set maxPrice dynamically
-        setFilters((prev) => ({ ...prev, priceRange: maxFetchedPrice })); // Update initial price range
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
+    async function getDataPageChange() {
+      const data = await getDetails(
+        `/api/product/all?search=${listType.searchText}&&page=${currentPage}&&limit=16&&maxPrice=${filters.priceRange}`
+      );
+
+      setList(data);
+      setMaxPages(data.maxPages);
+      setLoading(false);
+    }
+    getDataPageChange();
+  }, [currentPage, filters, listType, maxPrice]);
 
   // Adjust productsPerPage on window resize
-  useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-
-      const rowHeight = 250;
-      const rows = Math.floor(height / rowHeight);
-
-      if (width >= 1024) setProductsPerPage(rows * 4);
-      else if (width >= 768) setProductsPerPage(rows * 3);
-      else setProductsPerPage(rows * 2);
-
-      setCurrentPage(1);
-    };
-
-    window.addEventListener("resize", handleResize);
-    handleResize();
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Filter the products based on selected category and price range
-  const filteredProducts = products.filter((product) => {
-    const withinPriceRange = product.price <= filters.priceRange;
-    const matchesCategory = filters.category
-      ? product.category === filters.category
-      : true;
-    return withinPriceRange && matchesCategory;
-  });
-
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-  const displayedProducts = filteredProducts.slice(
-    (currentPage - 1) * productsPerPage,
-    currentPage * productsPerPage
-  );
 
   const handleFilterChange = ({ type, value }) => {
+    console.log(value);
     setFilters((prev) => ({ ...prev, [type]: value }));
     setCurrentPage(1);
   };
 
-  const handlePageChange = (page) => {
-    setLoading(true);
-    setCurrentPage(page);
+  const handlePageChange = (direction) => {
+    setCurrentPage((curr) => {
+      if (curr === 1 && direction === -1) return curr;
+      if (curr === maxPage && direction === 1) return curr;
+      let nextPage = curr + direction;
+      const arr = [];
+      if (nextPage === start + 5) {
+        const nextStart = start + 5;
+        for (let i = nextStart; i <= Math.min(maxPage, nextStart + 5); i++) {
+          arr.push(i);
+        }
 
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
+        setStartPage(nextPage);
+      } else if (nextPage < start) {
+        for (let i = start - 4; i <= start; i++) {
+          arr.push(i);
+        }
+        setStartPage(start - 4);
+      }
+
+      if (arr.length !== 0) setPageArray(arr);
+      return nextPage;
+    });
   };
+  useEffect(() => {
+    let arr = [];
+    for (let i = 1; i <= Math.min(maxPage, 5); i++) arr.push(i);
+    setPageArray(arr);
+  }, [maxPage]);
+
+  if (loading)
+    return (
+      <div className='flex justify-center items-center flex-1'>
+        <div className='w-16 h-16 border-4 border-gray-300 border-t-red-500 rounded-full animate-spin'></div>
+      </div>
+    );
+
+  if (list.list.length === 0)
+    return (
+      <div className=' flex gap-6 flex-col pt-32 items-center'>
+        <h1 className=' text-6xl'>🔎</h1>
+        <h1 className=' text-lg bg-red-500 text-white rounded-md px-5 py-2'>
+          Sorry, No Result not found
+        </h1>
+      </div>
+    );
 
   return (
     <div className='flex overflow-hidden'>
@@ -115,9 +109,8 @@ export function FilterProductPage() {
           >
             <ProductFilter
               onFilterChange={handleFilterChange}
-              maxPrice={maxPrice}
-              categories={categories}
-              currentPriceRange={filters.priceRange}
+              minPrice={list.minPrice}
+              maxPrice={list.maxPrice}
             />
           </div>
         </>
@@ -142,7 +135,7 @@ export function FilterProductPage() {
           <>
             <div className='p-2 h-full flex flex-col justify-between gap-5 overflow-y-auto w-full box-border'>
               <div className='max-[450px]:grid-cols-1 max-[1000px]:grid-cols-2 max-xl:grid-cols-3 h-fit grid grid-cols-4 gap-4'>
-                {list.map((product) => (
+                {list.list.map((product) => (
                   <ProductView
                     Key={product._id}
                     productDetails={{
@@ -158,10 +151,8 @@ export function FilterProductPage() {
               </div>
               <Pagination
                 currentPage={currentPage}
-                totalPages={totalPages}
-                totalProducts={filteredProducts.length}
-                productsPerPage={productsPerPage}
-                onPageChange={handlePageChange}
+                handlePageChange={handlePageChange}
+                pageArray={pageArray}
               />
             </div>
           </>
