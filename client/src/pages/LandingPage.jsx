@@ -22,6 +22,7 @@ export function LandingPage() {
             <NotificationBox.Registration />
             <NotificationBox.Login />
             <NotificationBox.AddNewAddress />
+            <NotificationBox.OrderConformation />
           </NotificationBox>
           <Toaster />
         </>

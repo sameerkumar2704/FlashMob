@@ -5,6 +5,7 @@ import { errorController } from "./controllers/error.controller.js";
 import { productRoute } from "./routes/product.routes.js";
 import { cartRouter } from "./routes/cart.routes.js";
 import { addressRouter } from "./routes/address.routes.js";
+import { orderRouter } from "./routes/order.routes.js";
 const app = express();
 
 app.use("/", (_, res, next) => {
@@ -23,5 +24,6 @@ app.use("/users", userRoute);
 app.use("/product", productRoute);
 app.use("/cart", cartRouter);
 app.use("/address", addressRouter);
+app.use("/orders", orderRouter);
 app.use(errorController);
 export { app };

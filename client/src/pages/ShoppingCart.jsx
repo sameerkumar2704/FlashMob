@@ -210,10 +210,11 @@ const ShoppingCart = () => {
                   ${total.toFixed(2)}
                 </span>
               </div>
-
-              <button className='w-full bg-red-600 text-white py-3 rounded-lg font-semibold text-sm hover:bg-red-700 transition-colors'>
-                Proceed to Checkout
-              </button>
+              <Link to={`/checkOut?type=cart}`}>
+                <button className='w-full bg-red-600 text-white py-3 rounded-lg font-semibold text-sm hover:bg-red-700 transition-colors'>
+                  Proceed to Checkout
+                </button>
+              </Link>
             </div>
           </div>
         </div>

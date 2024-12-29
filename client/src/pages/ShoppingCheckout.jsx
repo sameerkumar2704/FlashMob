@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Check, CreditCard, MapPin } from "lucide-react";
+import { Check, CreditCard, Flag, MapPin } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
-import { getDetails } from "@/util/fetchHandlers";
+import { getDetails, postDetails } from "@/util/fetchHandlers";
+import { useDispatch } from "react-redux";
+import { setDialogPage, setStateOfDialogBox } from "@/redux/slice";
 
 const ShoppingCheckout = () => {
   const [searchQuery, setSearchQuery] = useSearchParams();
@@ -10,21 +12,29 @@ const ShoppingCheckout = () => {
   const [address, setAddresses] = useState([]);
   const [refetch, setRefetch] = useState(false);
   const [shippingAddress, setShippingAddress] = useState(null);
-  console.log(searchQuery);
+  const dispatch = useDispatch();
   useEffect(() => {
     async function getSingleProduct() {
       setIsLoading(true);
       const res = await getDetails(
         `/api/product?productId=${searchQuery.get("productId")}`
       );
-      console.log(res);
+
       setProdutCart({
         list: [{ ...res.details, quantity: searchQuery.get("quantity") }],
       });
       setIsLoading(false);
     }
+    async function getCartProducts() {
+      setIsLoading(true);
+      const res = await getDetails("/api/cart/all");
+      setProdutCart({ list: res.list });
+      setIsLoading(false);
+    }
     if (searchQuery.get("type") === "product") {
       getSingleProduct();
+    } else {
+      getCartProducts();
     }
   }, []);
   useEffect(() => {
@@ -38,37 +48,9 @@ const ShoppingCheckout = () => {
       }
     }
     getAddressList();
-  }, [refetch]);
+  }, [refetch, shippingAddress]);
 
   const [showAddresses, setShowAddresses] = useState(false);
-
-  const defaultAddress = {
-    id: 1,
-    name: "John Doe",
-    street: "123 Main Street",
-    city: "New York",
-    state: "NY",
-    zip: "10001",
-    isDefault: true,
-  };
-
-  const savedAddresses = [
-    defaultAddress,
-    {
-      id: 2,
-      name: "John Doe",
-      street: "456 Park Avenue",
-      city: "Brooklyn",
-      state: "NY",
-      zip: "11201",
-      isDefault: false,
-    },
-  ];
-
-  const sampleCart = [
-    { id: 1, name: "Product 1", price: 29.99, quantity: 1 },
-    { id: 2, name: "Product 2", price: 49.99, quantity: 2 },
-  ];
 
   const calculateTotal = () => {
     return productInCart.list.reduce(
@@ -77,7 +59,7 @@ const ShoppingCheckout = () => {
     );
   };
   if (isLoading) return <h1>Loadding..</h1>;
-  console.log(address);
+
   return (
     <div className='w-full max-w-4xl mx-auto p-4'>
       <div className='bg-white rounded-lg shadow-lg p-6'>
@@ -86,7 +68,7 @@ const ShoppingCheckout = () => {
         {/* Cart Items */}
         <div className='mb-8'>
           <h2 className='text-xl font-semibold mb-4'>Order Summary</h2>
-          <div className='space-y-4'>
+          <div className='space-y-4  max-h-96 overflow-y-scroll'>
             {productInCart.list.map((item) => (
               <div
                 key={item.id}
@@ -223,7 +205,18 @@ const ShoppingCheckout = () => {
         </div>
 
         {/* Place Order Button */}
-        <button className='w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium'>
+        <button
+          onClick={async () => {
+            await postDetails("/api/orders", {
+              products: productInCart.list,
+              address: shippingAddress,
+              amount: calculateTotal().toFixed(2),
+            });
+            dispatch(setStateOfDialogBox(true));
+            dispatch(setDialogPage("Order Confromation"));
+          }}
+          className='w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium'
+        >
           Place Order
         </button>
       </div>

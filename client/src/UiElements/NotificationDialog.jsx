@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
+import { CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   currentUserInstance,
@@ -14,7 +14,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { MdCancel } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const context = createContext(undefined);
 const useNotificiationContext = () => {
@@ -248,7 +248,33 @@ const AddNewAddress = () => {
     </form>
   );
 };
+const OrderConformation = () => {
+  const dispatch = useDispatch();
+  const { setAnimate } = useNotificiationContext();
+  const { page } = useSelector((state) => state.global);
+  const navigation = useNavigate();
+  useEffect(() => {
+    setTimeout(() => {
+      setAnimate(true);
+      setTimeout(() => {
+        dispatch(setStateOfDialogBox(false));
+      }, 200);
+    }, 1500);
+    navigation("/");
+  }, []);
+  if (page.toLowerCase() !== "order confromation") return;
+  return (
+    <div className='text-center mb-8'>
+      <CheckCircle className='w-16 h-16 text-green-500 mx-auto mb-4' />
+      <h1 className='text-3xl font-bold text-gray-900 mb-2'>
+        Order Confirmed!
+      </h1>
+      <p className='text-gray-600'>Thank you for your purchase</p>
+    </div>
+  );
+};
 NotificationBox.Registration = RegistaionForm;
 NotificationBox.Login = LoginInForm;
 NotificationBox.AddNewAddress = AddNewAddress;
+NotificationBox.OrderConformation = OrderConformation;
 export { NotificationBox };

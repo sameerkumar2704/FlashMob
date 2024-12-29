@@ -12,7 +12,7 @@ const productModel = {
   reviews: [
     {
       type: Schema.Types.ObjectId,
-      ref: "ecomusers",
+      ref: "users",
     },
   ],
 };

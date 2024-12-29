@@ -8,7 +8,46 @@ import { useDispatch } from "react-redux";
 import { getDetails, postDetails } from "@/util/fetchHandlers";
 import { asyncHandler } from "@/util/asynHandler";
 import { useToast } from "@/hooks/use-toast";
-
+const RecentOrders = () => {
+  const [orders, setOrders] = useState([]);
+  useEffect(() => {
+    async function getOrderList() {
+      const res = await getDetails("/api/orders/");
+      setOrders(res.orders);
+    }
+    getOrderList();
+  }, []);
+  console.log(orders);
+  return (
+    <Card className='border-red-200 min-w-72  overflow-hidden'>
+      <CardHeader className='bg-red-50'>
+        <CardTitle className='flex items-center text-red-900'>
+          <Package className='w-5 h-5 mr-2 text-red-600' />
+          Recent Orders
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className='space-y-4'>
+          {orders.map((order) => (
+            <div
+              key={order._id}
+              className='flex justify-between items-center p-4 border border-red-200 rounded hover:bg-red-50'
+            >
+              <div className='space-y-1'>
+                <p className='font-medium text-red-900'>Order #{order._id}</p>
+                <p className='text-sm text-red-600'>{order.createAt}</p>
+              </div>
+              <div className='text-right'>
+                <p className='font-medium text-red-900'>{order.amount}</p>
+                <p className='text-sm text-red-600'>{order.status}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 const ProfilePage = () => {
   const { detail } = useLoaderData();
 
@@ -288,54 +327,7 @@ const ProfilePage = () => {
         </Card>
 
         {/* Orders Card */}
-        <Card className='border-red-200 min-w-72  overflow-hidden'>
-          <CardHeader className='bg-red-50'>
-            <CardTitle className='flex items-center text-red-900'>
-              <Package className='w-5 h-5 mr-2 text-red-600' />
-              Recent Orders
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className='space-y-4'>
-              {[
-                {
-                  id: 1,
-                  date: "2024-12-20",
-                  status: "Delivered",
-                  total: "$120.00",
-                },
-                {
-                  id: 2,
-                  date: "2024-12-15",
-                  status: "In Transit",
-                  total: "$85.50",
-                },
-                {
-                  id: 3,
-                  date: "2024-12-10",
-                  status: "Processing",
-                  total: "$230.75",
-                },
-              ].map((order) => (
-                <div
-                  key={order.id}
-                  className='flex justify-between items-center p-4 border border-red-200 rounded hover:bg-red-50'
-                >
-                  <div className='space-y-1'>
-                    <p className='font-medium text-red-900'>
-                      Order #{order.id}
-                    </p>
-                    <p className='text-sm text-red-600'>{order.date}</p>
-                  </div>
-                  <div className='text-right'>
-                    <p className='font-medium text-red-900'>{order.total}</p>
-                    <p className='text-sm text-red-600'>{order.status}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <RecentOrders />
       </div>
     </div>
   );
