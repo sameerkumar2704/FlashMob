@@ -61,4 +61,17 @@ const updateAddress = asyncHandler(async (req, res) => {
     .status(200)
     .send({ status: "success", message: "address is updated" });
 });
-export { addingNewAddress, getAddress, updateAddress };
+const removeAddress = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const addressId = req.params.id;
+  await address.updateOne(
+    {
+      user,
+      "address._id": addressId,
+    },
+    {
+      $pull: { address: { _id: addressId } },
+    }
+  );
+});
+export { addingNewAddress, getAddress, updateAddress, removeAddress };

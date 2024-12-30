@@ -10,7 +10,7 @@ const addressModel = {
       isDefault: { type: Boolean, default: false },
     },
   ],
-  user: { type: Schema.Types.ObjectId, ref: "addresss" },
+  user: { type: Schema.Types.ObjectId, ref: "user" },
 };
 const addressSchema = mongoose.Schema(addressModel, { timestamps: true });
 // addressSchema.methods.updateAddress = async function (updateAddress) {

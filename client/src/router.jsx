@@ -10,6 +10,7 @@ import { globalStore } from "./redux/store";
 import ShoppingCart from "./pages/ShoppingCart";
 import { ViewAllPage } from "./pages/ViewAllPage";
 import ShoppingCheckout from "./pages/ShoppingCheckout";
+import { OrderList } from "./pages/OrderPage";
 
 export const router = createBrowserRouter([
   {
@@ -59,6 +60,10 @@ export const router = createBrowserRouter([
       {
         path: "/checkOut",
         element: <ShoppingCheckout />,
+      },
+      {
+        path: "/orders",
+        element: <OrderList />,
       },
     ],
   },

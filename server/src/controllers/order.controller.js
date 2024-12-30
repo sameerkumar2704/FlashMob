@@ -19,7 +19,19 @@ export const handlingNewOrder = asyncHandler(async (req, res) => {
 
 export const getUserOrderList = async (req, res) => {
   const userRef = req.user;
-  const query = await Order.find({ orderBy: userRef });
+  const limit = req.query?.limit || Number.MAX_VALUE;
+  let query = {};
+  if (limit !== Number.MAX_VALUE) {
+    query = await Order.find({ orderBy: userRef })
+      .limit(limit)
+      .sort({ createdAt: "desc" });
+  } else {
+    query = await Order.find({ orderBy: userRef })
+
+      .sort({ createdAt: "desc" })
+      .populate("products._id");
+  }
+
   const arr = query.map((curr) => curr.toObject());
 
   return res.status(200).json({

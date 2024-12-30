@@ -216,17 +216,15 @@ const AddNewAddress = () => {
   const { isOutline, setAnimate } = useNotificiationContext();
   if (page.toLowerCase() !== "new address") return;
   return (
-    <form className=' p-4 flex flex-col gap-4'>
-      <Input ref={houeNo} placeholder='House No' />
-      <Input ref={street} placeholder='Street Address' />
-      <Input ref={city} placeholder='City' />
-      <Input ref={state} placeholder='State' />
-      <Input ref={zipcode} placeholder='Zipcode' />
-      <Button
-        onClick={asyncHandler(async () => {
+    <form
+      className=' p-4 flex flex-col gap-4'
+      onSubmit={(e) => {
+        e.preventDefault();
+        asyncHandler(async () => {
           // let userDetail = await postDetails("/api/users/login", obj);
           // if (userDetail.status === "failed")
           //   throw new Error(userDetail.message);
+
           const resp = await postDetails("/api/address/add", {
             houseNo: houeNo.current.value,
             zipcode: zipcode.current.value,
@@ -238,8 +236,16 @@ const AddNewAddress = () => {
           setTimeout(() => {
             dispatch(setStateOfDialogBox(false));
           }, 200);
-          dispatch(setToastMessage("Login Completed"));
-        }, toast)}
+          dispatch(setToastMessage("Address is Added"));
+        }, toast);
+      }}
+    >
+      <Input required ref={houeNo} placeholder='House No' />
+      <Input required ref={street} placeholder='Street Address' />
+      <Input required ref={city} placeholder='City' />
+      <Input required ref={state} placeholder='State' />
+      <Input required ref={zipcode} placeholder='Zipcode' />
+      <Button
         className={` mt-10 py-2  w-full hover:bg-red-500/90 
           ${isOutline ? "border border-red-500" : "bg-red-500"}`}
       >
@@ -254,6 +260,7 @@ const OrderConformation = () => {
   const { page } = useSelector((state) => state.global);
   const navigation = useNavigate();
   useEffect(() => {
+    if (page.toLowerCase() !== "order confromation") return;
     setTimeout(() => {
       setAnimate(true);
       setTimeout(() => {
