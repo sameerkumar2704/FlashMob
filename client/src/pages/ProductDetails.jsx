@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { GoHeart } from "react-icons/go";
 import { MdOutlineLocalShipping, MdVerified } from "react-icons/md";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { getDetails, postDetails } from "@/util/fetchHandlers";
 import { useDispatch, useSelector } from "react-redux";
 import { asyncHandler } from "@/util/asynHandler";
@@ -18,13 +18,12 @@ function ProductDetails() {
   const [isLoading, setIsLoading] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const { currentUser } = useSelector((state) => state.global);
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   useEffect(() => {
     asyncHandler(async () => {
-      const res = await getDetails(
-        `http://localhost:8080/product?productId=${productId}`
-      );
+      const res = await getDetails(`/api/product?productId=${productId}`);
       setProductDetails(res.details);
     }, toast)();
   }, [productId]);
@@ -36,7 +35,7 @@ function ProductDetails() {
     }
     asyncHandler(async () => {
       const res = await getDetails(
-        `http://localhost:8080/cart/productIsPresent?user=${currentUser?._id}&product_item=${productDetails._id}`
+        `/api/cart/productIsPresent?user=${currentUser?._id}&product_item=${productDetails._id}`
       );
       setPresentInCart(res.productInCart);
       if (res.productInCart) {
@@ -244,13 +243,21 @@ function ProductDetails() {
                     <GoHeart size={24} />
                   </button>
                 </div>
-                <Link
-                  to={`/checkOut?type=product&&productId=${productId}&&quantity=${quantity}`}
+
+                <Button
+                  onClick={() => {
+                    if (!currentUser) {
+                      dispatch(setStateOfDialogBox(true));
+                      return;
+                    }
+                    navigate(
+                      `/checkOut?type=product&&productId=${productId}&&quantity=${quantity}`
+                    );
+                  }}
+                  className='bg-green-600 w-full sm:w-[50%]'
                 >
-                  <Button className='bg-green-600 w-full sm:w-[50%]'>
-                    Buy Now
-                  </Button>
-                </Link>
+                  Buy Now
+                </Button>
               </div>
 
               <div className='bg-gray-100 rounded-xl p-4'>
