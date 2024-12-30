@@ -7,7 +7,7 @@ import {
   logoutUser,
   refreshAcessToken,
   registerUser,
-  resetPassword,
+  resetPassword
 } from "../controllers/user.controller.js";
 import { verifyToken } from "../middelwares/user.middelware.js";
 
@@ -21,3 +21,4 @@ userRoute.route("/refreshToken").get(refreshAcessToken);
 userRoute.route("/forgotPassword").post(forgotPassword);
 userRoute.route("/resetPassword/:token").patch(resetPassword);
 export { userRoute };
+

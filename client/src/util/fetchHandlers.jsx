@@ -25,3 +25,17 @@ export async function postDetails(url, body) {
   const result = await res?.json();
   return result;
 }
+
+// patch
+export async function patchDetails(url, body) {
+  const res = await fetch(url, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+  if (res.status === 304) return { status: 304 };
+  const result = await res?.json();
+  return result;
+}
+

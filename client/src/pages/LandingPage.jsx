@@ -23,6 +23,8 @@ export function LandingPage() {
             <NotificationBox.Login />
             <NotificationBox.AddNewAddress />
             <NotificationBox.OrderConformation />
+            <NotificationBox.ForgotPassword />
+            <NotificationBox.ResetPassword />
           </NotificationBox>
           <Toaster />
         </>

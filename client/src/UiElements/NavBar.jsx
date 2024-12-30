@@ -37,7 +37,7 @@ export function NavBar() {
           className=' max-sm:block hidden'
         />
         <Link to={"/"} className=' max-sm:hidden'>
-          Logo
+          FlashMob
         </Link>
         <div className='flex-1'>
           <Input
@@ -112,7 +112,7 @@ export function NavBar() {
                 variant='primary'
                 onClick={() => dispatch(setStateOfDialogBox(true))}
               >
-                Sing up
+                Sign up
               </Button>
             </li>
           )}

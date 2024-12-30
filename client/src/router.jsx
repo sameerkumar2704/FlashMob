@@ -4,7 +4,7 @@ import { LandingPage } from "./pages/landingPage";
 import ProductDetails from "./pages/ProductDetails";
 import { FilterProductPage } from "./pages/FilterProductPage";
 import { getDetails } from "./util/fetchHandlers";
-import { ForgotPassword } from "./pages/ForgotPassword";
+// import { ForgotPassword } from "./pages/ForgotPassword";
 import { ProfilePage } from "./pages/ProfilePage";
 import { globalStore } from "./redux/store";
 import ShoppingCart from "./pages/ShoppingCart";
@@ -68,8 +68,8 @@ export const router = createBrowserRouter([
     ],
   },
 
-  {
-    path: "forgotPassword",
-    element: <ForgotPassword />,
-  },
+  // {
+  //   path: "forgotPassword",
+  //   element: <ForgotPassword />,
+  // },
 ]);

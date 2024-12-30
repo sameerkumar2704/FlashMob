@@ -102,11 +102,12 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
   const user = await User.findOne({ email });
   if (!user) throw new ApiError("user not found", 404);
   const resetToken = user.createPasswordRestToken();
+  
   await user.save();
   // const resetUrl = `${req.protocol}://${req.get(
   //   "host"
   // )}/user/resetPassword/${resetToken}`;
-  const message = `we have recived a password reset request please use below token \n\n${resetToken} this token valid only for 5 minutes`;
+  const message = `We have received a password reset request.Token valid only for 5 minutes.\nPlease use the token below : \n\n${resetToken} \n`;
   try {
     await sendEmail({
       email: email,
