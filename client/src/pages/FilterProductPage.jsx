@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ProductFilter } from "../components/ProductFilter";
 import { Pagination } from "../components/Pagination";
 import { useLocation, useParams } from "react-router-dom";
@@ -7,6 +7,7 @@ import { getDetails } from "@/util/fetchHandlers";
 
 export function FilterProductPage() {
   const listType = useParams();
+
   const [list, setList] = useState({});
 
   const [filters, setFilters] = useState({
@@ -14,7 +15,7 @@ export function FilterProductPage() {
     priceRange: Infinity,
   });
   const currentLocation = useLocation();
-  const [maxPrice, setMaxPrice] = useState(Infinity);
+  const maxPrice = useRef(Infinity);
   const [maxPage, setMaxPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -27,7 +28,7 @@ export function FilterProductPage() {
   useEffect(() => {
     async function getDataPageChange() {
       const data = await getDetails(
-        `http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/product/all?search=${listType.searchText}&&page=${currentPage}&&limit=16&&maxPrice=${filters.priceRange}`
+        `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/product/all?search=${listType.searchText}&&page=${currentPage}&&limit=16&&maxPrice=${filters.priceRange}`
       );
 
       setList(data);

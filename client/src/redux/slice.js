@@ -6,8 +6,8 @@ export const getAllProducts = createAsyncThunk(
   "global/allproducts",
   async (limit) => {
     const url = limit
-      ? `http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/product/all?limit=${limit}`
-      : "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/product/all";
+      ? `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/product/all?limit=${limit}`
+      : "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/product/all";
     const res = await getDetails(url, {});
     return res;
   }

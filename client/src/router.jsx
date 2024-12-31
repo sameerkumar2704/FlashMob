@@ -1,10 +1,8 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import { HomePage } from "./pages/HomePage";
 import { LandingPage } from "./pages/LandingPage";
 import ProductDetails from "./pages/ProductDetails";
 import { FilterProductPage } from "./pages/FilterProductPage";
-import { getDetails } from "./util/fetchHandlers";
-// import { ForgotPassword } from "./pages/ForgotPassword";
 import { ProfilePage } from "./pages/ProfilePage";
 import { globalStore } from "./redux/store";
 import ShoppingCart from "./pages/ShoppingCart";
@@ -41,9 +39,7 @@ export const router = createBrowserRouter([
           const state = globalStore.getState();
           if (!state.global.currentUser)
             throw new Response("", { status: 302, headers: { Location: "/" } });
-          return getDetails(
-            "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/users/"
-          );
+          return [];
         },
 
         element: <ProfilePage />,
@@ -55,9 +51,7 @@ export const router = createBrowserRouter([
           const state = globalStore.getState();
           if (!state.global.currentUser)
             throw new Response("", { status: 302, headers: { Location: "/" } });
-          return getDetails(
-            "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/cart/all"
-          );
+          return [];
         },
         element: <ShoppingCart />,
       },
@@ -71,9 +65,4 @@ export const router = createBrowserRouter([
       },
     ],
   },
-
-  // {
-  //   path: "forgotPassword",
-  //   element: <ForgotPassword />,
-  // },
 ]);

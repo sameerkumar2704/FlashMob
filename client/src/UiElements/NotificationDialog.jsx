@@ -4,6 +4,7 @@ import { CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   currentUserInstance,
+  loadingState,
   setDialogPage,
   setStateOfDialogBox,
   setToastMessage,
@@ -11,7 +12,6 @@ import {
 import { asyncHandler } from "@/util/asynHandler";
 import { postDetails, patchDetails } from "@/util/fetchHandlers";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { FcGoogle } from "react-icons/fc";
 import { MdCancel } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -101,13 +101,13 @@ const RegistaionForm = () => {
           };
 
           const result = await postDetails(
-            "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/users/register",
+            "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/users/register",
             obj
           );
           if (result.status === "failed") throw new Error(result.message);
 
           const userDetail = await postDetails(
-            "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/users/login",
+            "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/users/login",
             obj
           );
 
@@ -117,7 +117,7 @@ const RegistaionForm = () => {
             dispatch(currentUserInstance(JSON.parse(userDetail.detail)));
             dispatch(setStateOfDialogBox(false));
           }, 200);
-          dispatch(setToastMessage("Login Completed"));
+          dispatch(setToastMessage("Account is Created"));
         }, toast)}
         className={` mt-10 py-2  w-full hover:bg-red-500/90 
           ${isOutline ? "border border-red-500" : "bg-red-500"}`}
@@ -174,7 +174,7 @@ const LoginInForm = () => {
           };
 
           let userDetail = await postDetails(
-            "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/users/login",
+            "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/users/login",
             obj
           );
           if (userDetail.status === "failed")
@@ -190,7 +190,7 @@ const LoginInForm = () => {
         className={` mt-10 py-2  w-full hover:bg-red-500/90 
           ${isOutline ? "border border-red-500" : "bg-red-500"}`}
       >
-        Sign Up
+        Sign In
       </Button>
       <div className=' w-full  bg-gray-200 h-[1px] mt-5 rounded-full  ' />
       <div className=' mt-5 space-y-3'>
@@ -222,30 +222,26 @@ const AddNewAddress = () => {
   return (
     <form
       className=' p-4 flex flex-col gap-4'
-      onSubmit={(e) => {
+      onSubmit={asyncHandler(async (e) => {
         e.preventDefault();
-        asyncHandler(async () => {
-          // let userDetail = await postDetails("http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/users/login", obj);
-          // if (userDetail.status === "failed")
-          //   throw new Error(userDetail.message);
-
-          const resp = await postDetails(
-            "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/address/add",
-            {
-              houseNo: houeNo.current.value,
-              zipcode: zipcode.current.value,
-              street: street.current.value,
-              state: state.current.value,
-              city: city.current.value,
-            }
-          );
-          setAnimate(true);
-          setTimeout(() => {
-            dispatch(setStateOfDialogBox(false));
-          }, 200);
-          dispatch(setToastMessage("Address is Added"));
-        }, toast);
-      }}
+        console.log("clicked");
+        const resp = await postDetails(
+          "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/add",
+          {
+            houseNo: houeNo.current.value,
+            zipcode: zipcode.current.value,
+            street: street.current.value,
+            state: state.current.value,
+            city: city.current.value,
+          }
+        );
+        setAnimate(true);
+        setTimeout(() => {
+          dispatch(setStateOfDialogBox(false));
+        }, 200);
+        dispatch(loadingState(true));
+        dispatch(setToastMessage("Address is Added"));
+      }, toast)}
     >
       <Input required ref={houeNo} placeholder='House No' />
       <Input required ref={street} placeholder='Street Address' />
@@ -290,7 +286,7 @@ const OrderConformation = () => {
 
 const ForgotPassword = () => {
   const dispatch = useDispatch();
-  const { isOutline, setAnimate } = useNotificiationContext();
+  const { isOutline } = useNotificiationContext();
   const { page } = useSelector((state) => state.global);
   const email = useRef();
   const { toast } = useToast();
@@ -317,7 +313,7 @@ const ForgotPassword = () => {
             };
 
             const result = await postDetails(
-              "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/users/forgotPassword",
+              "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/users/forgotPassword",
               obj
             );
             if (result.status === "failed") throw new Error(result.message);
@@ -396,7 +392,7 @@ const ResetPassword = () => {
             }
 
             const result = await patchDetails(
-              `http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/users/resetPassword/${resetToken.current.value}`,
+              `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/users/resetPassword/${resetToken.current.value}`,
               {
                 password: password.current.value,
               }

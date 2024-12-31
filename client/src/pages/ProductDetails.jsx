@@ -24,7 +24,7 @@ function ProductDetails() {
   useEffect(() => {
     asyncHandler(async () => {
       const res = await getDetails(
-        `http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/product?productId=${productId}`
+        `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/product?productId=${productId}`
       );
       setProductDetails(res.details);
     }, toast)();
@@ -37,7 +37,7 @@ function ProductDetails() {
     }
     asyncHandler(async () => {
       const res = await getDetails(
-        `http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/cart/productIsPresent?user=${currentUser?._id}&product_item=${productDetails._id}`
+        `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/cart/productIsPresent?user=${currentUser?._id}&product_item=${productDetails._id}`
       );
       setPresentInCart(res.productInCart);
       if (res.productInCart) {
@@ -53,11 +53,14 @@ function ProductDetails() {
     }
     try {
       setIsLoading(true);
-      await postDetails("http://localhost:8080/cart/add", {
-        user: currentUser?._id,
-        product_item: productDetails._id,
-        increaseQuantity: quantity,
-      });
+      await postDetails(
+        "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/cart/add",
+        {
+          user: currentUser?._id,
+          product_item: productDetails._id,
+          increaseQuantity: quantity,
+        }
+      );
       setPresentInCart(true);
       setCartQuantity(quantity);
     } catch (error) {
@@ -224,11 +227,11 @@ function ProductDetails() {
               </div>
 
               <div className='space-y-4'>
-                <div className='flex flex-col sm:flex-row items-stretch justify-center gap-4'>
+                <div className='flex flex-col  items-stretch justify-center gap-4'>
                   <button
                     onClick={handleAddToCart}
                     disabled={isLoading}
-                    className={`flex-1 px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-[1.02] 
+                    className={`max-w-56 flex-1 px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-[1.02] 
                       ${
                         isLoading
                           ? "bg-red-400 cursor-wait"
@@ -237,29 +240,21 @@ function ProductDetails() {
                   >
                     {isLoading ? "Adding..." : `Add to Cart (${quantity})`}
                   </button>
-
-                  <button
-                    className='p-3 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-100 
-                      transition-all transform hover:scale-[1.02] bg-white shadow-sm hover:shadow-md'
+                  <Button
+                    onClick={() => {
+                      if (!currentUser) {
+                        dispatch(setStateOfDialogBox(true));
+                        return;
+                      }
+                      navigate(
+                        `/checkOut?type=product&&productId=${productId}&&quantity=${quantity}`
+                      );
+                    }}
+                    className='bg-green-600 w-full max-w-56'
                   >
-                    <GoHeart size={24} />
-                  </button>
+                    Buy Now
+                  </Button>
                 </div>
-
-                <Button
-                  onClick={() => {
-                    if (!currentUser) {
-                      dispatch(setStateOfDialogBox(true));
-                      return;
-                    }
-                    navigate(
-                      `/checkOut?type=product&&productId=${productId}&&quantity=${quantity}`
-                    );
-                  }}
-                  className='bg-green-600 w-full sm:w-[50%]'
-                >
-                  Buy Now
-                </Button>
               </div>
 
               <div className='bg-gray-100 rounded-xl p-4'>

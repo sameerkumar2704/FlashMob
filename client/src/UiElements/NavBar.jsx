@@ -59,16 +59,6 @@ export function NavBar() {
         </div>
 
         <ul className=' max-sm:hidden items-center flex gap-4 px-3'>
-          <li
-            onClick={() => {
-              if (currentUser === undefined) {
-                dispatch(setDialogPage("registration"));
-                dispatch(setStateOfDialogBox(true));
-              }
-            }}
-          >
-            <MenuItem icon={<GoHeart className=' w-full h-full' />} />
-          </li>
           <Link
             onClick={() => {
               if (currentUser === undefined) {
@@ -96,7 +86,7 @@ export function NavBar() {
                 variant='primary'
                 onClick={async () => {
                   await fetch(
-                    "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/users/logout"
+                    "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/users/logout"
                   );
                   dispatch(currentUserInstance(undefined));
                   dispatch(setDialogPage("registration"));

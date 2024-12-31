@@ -1,11 +1,20 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { Minus, Plus, ShoppingBag, Trash2, ShoppingBasket } from "lucide-react";
-import { Link, useLoaderData } from "react-router-dom";
-import { deleteItem, postDetails } from "@/util/fetchHandlers";
+import { Link } from "react-router-dom";
+import { deleteItem, getDetails, postDetails } from "@/util/fetchHandlers";
 
 const ShoppingCart = () => {
-  const { list } = useLoaderData();
-  const [products, setProducts] = useState(list);
+  const [products, setProducts] = useState(undefined);
+
+  useEffect(() => {
+    async function getCartProducts() {
+      const res = await getDetails(
+        "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/cart/all"
+      );
+      setProducts(res.list);
+    }
+    getCartProducts();
+  }, []);
 
   const updateQuantity = async (id, change) => {
     let quantity = 1;
@@ -19,19 +28,28 @@ const ShoppingCart = () => {
         return product;
       })
     );
-    await postDetails("http://localhost:8080/cart/add", {
-      product_item: id,
+    await postDetails(
+      "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/cart/add",
+      {
+        product_item: id,
 
-      quantity,
-    });
+        quantity,
+      }
+    );
   };
 
   const removeProduct = async (id) => {
     await deleteItem(
-      `http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/cart?productId=${id}`
+      `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/cart?productId=${id}`
     );
     setProducts(products.filter((product) => product._id !== id));
   };
+  if (!products)
+    return (
+      <div className='flex items-center justify-center h-[calc(100vh-4rem)] bg-gray-50'>
+        <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500' />
+      </div>
+    );
 
   const total = products.reduce(
     (sum, product) => sum + product.price * product.quantity,
@@ -73,7 +91,7 @@ const ShoppingCart = () => {
             ${product.price}
           </span>
           <button
-            onClick={() => removeProduct(product.id)}
+            onClick={() => removeProduct(product._id)}
             className='text-gray-400 hover:text-red-600 transition-colors'
             aria-label='Remove item'
           >

@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Package, Edit2, Trash2 } from "lucide-react";
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { setDialogPage, setStateOfDialogBox } from "@/redux/slice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { deleteItem, getDetails, postDetails } from "@/util/fetchHandlers";
 import { asyncHandler } from "@/util/asynHandler";
 import { useToast } from "@/hooks/use-toast";
@@ -15,7 +15,7 @@ const RecentOrders = () => {
   useEffect(() => {
     async function getOrderList() {
       const res = await getDetails(
-        "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/orders/?limit=3"
+        "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/orders/?limit=3"
       );
       setOrders(res.orders);
     }
@@ -60,7 +60,7 @@ const RecentOrders = () => {
                 </p>
               </div>
               <div className='text-right'>
-                <p className='font-medium text-red-900'>{order.amount}</p>
+                <p className='font-medium text-red-900'>${order.amount}</p>
                 <p className='text-sm text-red-600'>{order.status}</p>
               </div>
             </div>
@@ -75,6 +75,7 @@ const UserAddress = () => {
   const dispatch = useDispatch();
   const { toast } = useToast();
 
+  const { isDataLoading } = useSelector((state) => state.global);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState(null);
 
@@ -96,11 +97,11 @@ const UserAddress = () => {
     }));
   };
   const [refetch, setRefetch] = useState(false);
-  const [addresses, setAddresses] = useState([]);
+  const [addresses, setAddresses] = useState(undefined);
   const handleSubmit = asyncHandler(async (e) => {
     e.preventDefault();
     const res = await postDetails(
-      "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/address/",
+      "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/",
       formData
     );
     if (res.status === 304) {
@@ -120,7 +121,7 @@ const UserAddress = () => {
   const handleDelete = (id) => {
     setAddresses(addresses.filter((addr) => addr._id !== id));
     deleteItem(
-      `http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/address/${id}`
+      `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/${id}`
     );
   };
 
@@ -140,7 +141,7 @@ const UserAddress = () => {
 
   const setDefaultAddress = async (formData) => {
     const res = await postDetails(
-      "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/address/",
+      "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/",
       formData
     );
     if (res.status === 304) {
@@ -151,13 +152,18 @@ const UserAddress = () => {
   useEffect(() => {
     async function getAddressList() {
       const res = await getDetails(
-        "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/address/"
+        "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/"
       );
       setAddresses(res.list.address);
     }
     getAddressList();
-  }, [refetch]);
-
+  }, [refetch, isDataLoading]);
+  if (!addresses)
+    return (
+      <div className='flex items-center justify-center border-red-200 overflow-hidden min-w-96 bg-gray-50'>
+        <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500' />
+      </div>
+    );
   return (
     <Card className='border-red-200 overflow-hidden min-w-96'>
       <CardHeader className='bg-red-50 flex flex-row items-center justify-between'>
@@ -335,7 +341,22 @@ const UserAddress = () => {
   );
 };
 const ProfilePage = () => {
-  const { detail } = useLoaderData();
+  const [detail, setDetails] = useState(undefined);
+  useEffect(() => {
+    async function getAboutUser() {
+      const res = await getDetails(
+        "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/users/"
+      );
+      setDetails(res.detail);
+    }
+    getAboutUser();
+  }, []);
+  if (!detail)
+    return (
+      <div className='flex items-center justify-center h-[calc(100vh-4rem)] bg-gray-50'>
+        <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500' />
+      </div>
+    );
 
   return (
     <div className=' flex flex-col items-center p-4 space-y-6'>

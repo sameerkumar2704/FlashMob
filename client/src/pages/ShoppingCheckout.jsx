@@ -17,7 +17,7 @@ const ShoppingCheckout = () => {
     async function getSingleProduct() {
       setIsLoading(true);
       const res = await getDetails(
-        `http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/product?productId=${searchQuery.get(
+        `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/product?productId=${searchQuery.get(
           "productId"
         )}`
       );
@@ -30,7 +30,7 @@ const ShoppingCheckout = () => {
     async function getCartProducts() {
       setIsLoading(true);
       const res = await getDetails(
-        "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/cart/all"
+        "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/cart/all"
       );
       setProdutCart({ list: res.list });
       setIsLoading(false);
@@ -44,7 +44,7 @@ const ShoppingCheckout = () => {
   useEffect(() => {
     async function getAddressList() {
       const res = await getDetails(
-        "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/address/"
+        "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/"
       );
       setAddresses(res.list.address);
       if (!shippingAddress) {
@@ -214,7 +214,7 @@ const ShoppingCheckout = () => {
         <button
           onClick={async () => {
             await postDetails(
-              "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/orders",
+              "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/orders",
               {
                 products: productInCart.list,
                 address: shippingAddress,

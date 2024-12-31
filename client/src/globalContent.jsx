@@ -19,14 +19,14 @@ export function GlobalContent({ children }) {
     async function verifyUser() {
       try {
         let userDetail = await getDetails(
-          "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/users/currentUser"
+          "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/users/currentUser"
         );
 
         if (userDetail.status !== "failed") {
           dispatch(currentUserInstance(JSON.parse(userDetail.detail)));
         } else {
           userDetail = await getDetails(
-            "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/users/refreshToken",
+            "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/users/refreshToken",
             {}
           );
           if (userDetail.status === "failed") {

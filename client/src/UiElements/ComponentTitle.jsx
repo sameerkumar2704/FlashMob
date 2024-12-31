@@ -7,7 +7,10 @@ export function ComponentTitle({ title, lessElements, endPoint }) {
       <div className=' bg-red-500  w-4 rounded-sm h-full '></div>
       <h1 className=' font-semibold text-red-500 text-sm'>{title}</h1>
       {!lessElements && (
-        <Link className=' ml-auto' to={`/filter-products/${endPoint}`}>
+        <Link
+          className=' ml-auto'
+          to={`/filter-products/${endPoint}&title=${title}`}
+        >
           <Button variant='primary'>view all</Button>
         </Link>
       )}

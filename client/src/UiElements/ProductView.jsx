@@ -29,7 +29,7 @@ export function ProductView({ productDetails }) {
           <h1 className=' text-xs line-clamp-3 font-semibold'>
             {productDetails.title}
           </h1>
-          <h1 className=' text-red-500'>₹.{productDetails.price}</h1>
+          <h1 className=' text-red-500'>${productDetails.price}</h1>
         </>
       )}
     </div>

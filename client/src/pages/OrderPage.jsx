@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, MapPin } from "lucide-react";
 import { getDetails } from "@/util/fetchHandlers";
 
@@ -7,7 +7,7 @@ const OrderList = () => {
   useEffect(() => {
     async function getOrders() {
       const data = await getDetails(
-        "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/orders"
+        "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/orders"
       );
       setOrders(data.orders);
     }
@@ -120,9 +120,7 @@ const OrderList = () => {
                 <div className='flex justify-end pt-2 border-t border-red-200'>
                   <div className='text-lg font-medium'>
                     <span className='text-black'>Order Total:</span>
-                    <span className='ml-2 text-red-600'>
-                      ${order.totalAmount}
-                    </span>
+                    <span className='ml-2 text-red-600'>${order.amount}</span>
                   </div>
                 </div>
               </div>
