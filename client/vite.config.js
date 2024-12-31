@@ -7,7 +7,7 @@ export default defineConfig({
     host: true,
     proxy: {
       "/api": {
-        target: "https://flashmobback.onrender.com",
+        target: "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
