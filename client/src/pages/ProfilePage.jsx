@@ -100,10 +100,7 @@ const UserAddress = () => {
   const [addresses, setAddresses] = useState(undefined);
   const handleSubmit = asyncHandler(async (e) => {
     e.preventDefault();
-    const res = await postDetails(
-      "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/",
-      formData
-    );
+    const res = await postDetails("https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/", formData);
     if (res.status === 304) {
       throw new Error("No Update in Address");
     }
@@ -120,9 +117,7 @@ const UserAddress = () => {
 
   const handleDelete = (id) => {
     setAddresses(addresses.filter((addr) => addr._id !== id));
-    deleteItem(
-      `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/${id}`
-    );
+    deleteItem(`https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/${id}`);
   };
 
   const resetForm = () => {
@@ -140,10 +135,7 @@ const UserAddress = () => {
   };
 
   const setDefaultAddress = async (formData) => {
-    const res = await postDetails(
-      "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/",
-      formData
-    );
+    const res = await postDetails("https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/", formData);
     if (res.status === 304) {
       throw new Error("No Update in Address");
     }
@@ -151,10 +143,12 @@ const UserAddress = () => {
   };
   useEffect(() => {
     async function getAddressList() {
-      const res = await getDetails(
-        "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/"
-      );
-      setAddresses(res.list.address);
+      const res = await getDetails("https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/");
+      if (res.list == null) {
+        setAddresses([]);
+      } else {
+        setAddresses(res.list.address);
+      }
     }
     getAddressList();
   }, [refetch, isDataLoading]);
@@ -164,6 +158,19 @@ const UserAddress = () => {
         <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500' />
       </div>
     );
+  if (addresses.length === 0)
+    return (
+      <Button
+        className='bg-red-600 hover:bg-red-700 text-white'
+        onClick={() => {
+          dispatch(setStateOfDialogBox(true));
+          dispatch(setDialogPage("New Address"));
+        }}
+      >
+        Add Address
+      </Button>
+    );
+
   return (
     <Card className='border-red-200 overflow-hidden min-w-96'>
       <CardHeader className='bg-red-50 flex flex-row items-center justify-between'>

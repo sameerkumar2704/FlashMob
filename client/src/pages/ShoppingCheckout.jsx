@@ -183,7 +183,7 @@ const ShoppingCheckout = () => {
         </div>
 
         {/* Payment Section */}
-        <div className='mb-8'>
+        {/* <div className='mb-8'>
           <h2 className='text-xl font-semibold mb-4'>Payment Method</h2>
           <div className='space-y-4'>
             <div className='flex items-center space-x-2 p-4 border rounded'>
@@ -208,7 +208,7 @@ const ShoppingCheckout = () => {
               />
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Place Order Button */}
         <button
