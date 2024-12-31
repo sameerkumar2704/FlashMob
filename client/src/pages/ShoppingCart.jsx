@@ -27,7 +27,9 @@ const ShoppingCart = () => {
   };
 
   const removeProduct = async (id) => {
-    await deleteItem(`/api/cart?productId=${id}`);
+    await deleteItem(
+      `http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/cart?productId=${id}`
+    );
     setProducts(products.filter((product) => product._id !== id));
   };
 

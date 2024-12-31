@@ -18,12 +18,17 @@ export function GlobalContent({ children }) {
   useEffect(() => {
     async function verifyUser() {
       try {
-        let userDetail = await getDetails("/api/users/currentUser");
+        let userDetail = await getDetails(
+          "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/users/currentUser"
+        );
 
         if (userDetail.status !== "failed") {
           dispatch(currentUserInstance(JSON.parse(userDetail.detail)));
         } else {
-          userDetail = await getDetails("/api/users/refreshToken", {});
+          userDetail = await getDetails(
+            "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/users/refreshToken",
+            {}
+          );
           if (userDetail.status === "failed") {
             throw new Error(userDetail.message);
           } else {
@@ -56,8 +61,8 @@ export function GlobalContent({ children }) {
     <>
       {children}
       {cartList.length > 0 && (
-        <div className="flex gap-2 m-4 items-center bg-white shadow-md px-3 py-1 rounded-md w-fit fixed bottom-0 border border-black/40">
-          <PiShoppingCartLight className="w-5 h-5" />
+        <div className='flex gap-2 m-4 items-center bg-white shadow-md px-3 py-1 rounded-md w-fit fixed bottom-0 border border-black/40'>
+          <PiShoppingCartLight className='w-5 h-5' />
           <h1>{cartList.length}</h1>
         </div>
       )}

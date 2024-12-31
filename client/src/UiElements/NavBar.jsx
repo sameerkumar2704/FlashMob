@@ -95,7 +95,9 @@ export function NavBar() {
               <Button
                 variant='primary'
                 onClick={async () => {
-                  await fetch("/api/users/logout");
+                  await fetch(
+                    "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/users/logout"
+                  );
                   dispatch(currentUserInstance(undefined));
                   dispatch(setDialogPage("registration"));
                   dispatch(setStateOfDialogBox(true));

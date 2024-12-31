@@ -14,14 +14,14 @@ export function HomePage() {
   const dispatch = useDispatch();
 
   const getDiscountedProducts = useCallback(async (category) => {
-    let url = `/api/product/sale?limit=5`;
+    let url = `http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/product/sale?limit=5`;
     if (category !== "all") url += `&category=${category}`;
     const data = await getDetails(url);
     setDiscountedProducts(data.list || []);
   }, []);
 
   const getNewProducts = useCallback(async (category) => {
-    let url = `/api/product/new?limit=5`;
+    let url = `http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/product/new?limit=5`;
     if (category !== "all") url += `&category=${category}`;
     const data = await getDetails(url);
     setNewProducts(data.list || []);

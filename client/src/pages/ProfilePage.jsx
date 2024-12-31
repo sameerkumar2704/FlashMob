@@ -14,7 +14,9 @@ const RecentOrders = () => {
   const navigate = useNavigate();
   useEffect(() => {
     async function getOrderList() {
-      const res = await getDetails("/api/orders/?limit=3");
+      const res = await getDetails(
+        "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/orders/?limit=3"
+      );
       setOrders(res.orders);
     }
     getOrderList();
@@ -97,7 +99,10 @@ const UserAddress = () => {
   const [addresses, setAddresses] = useState([]);
   const handleSubmit = asyncHandler(async (e) => {
     e.preventDefault();
-    const res = await postDetails("/api/address/", formData);
+    const res = await postDetails(
+      "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/address/",
+      formData
+    );
     if (res.status === 304) {
       throw new Error("No Update in Address");
     }
@@ -114,7 +119,9 @@ const UserAddress = () => {
 
   const handleDelete = (id) => {
     setAddresses(addresses.filter((addr) => addr._id !== id));
-    deleteItem(`/api/address/${id}`);
+    deleteItem(
+      `http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/address/${id}`
+    );
   };
 
   const resetForm = () => {
@@ -132,7 +139,10 @@ const UserAddress = () => {
   };
 
   const setDefaultAddress = async (formData) => {
-    const res = await postDetails("/api/address/", formData);
+    const res = await postDetails(
+      "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/address/",
+      formData
+    );
     if (res.status === 304) {
       throw new Error("No Update in Address");
     }
@@ -140,7 +150,9 @@ const UserAddress = () => {
   };
   useEffect(() => {
     async function getAddressList() {
-      const res = await getDetails("/api/address/");
+      const res = await getDetails(
+        "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/address/"
+      );
       setAddresses(res.list.address);
     }
     getAddressList();

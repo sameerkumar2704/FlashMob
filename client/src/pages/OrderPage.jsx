@@ -6,7 +6,9 @@ const OrderList = () => {
   const [orders, setOrders] = useState([]);
   useEffect(() => {
     async function getOrders() {
-      const data = await getDetails("/api/orders");
+      const data = await getDetails(
+        "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/orders"
+      );
       setOrders(data.orders);
     }
     getOrders();

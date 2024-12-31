@@ -17,7 +17,9 @@ const ShoppingCheckout = () => {
     async function getSingleProduct() {
       setIsLoading(true);
       const res = await getDetails(
-        `/api/product?productId=${searchQuery.get("productId")}`
+        `http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/product?productId=${searchQuery.get(
+          "productId"
+        )}`
       );
 
       setProdutCart({
@@ -27,7 +29,9 @@ const ShoppingCheckout = () => {
     }
     async function getCartProducts() {
       setIsLoading(true);
-      const res = await getDetails("/api/cart/all");
+      const res = await getDetails(
+        "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/cart/all"
+      );
       setProdutCart({ list: res.list });
       setIsLoading(false);
     }
@@ -39,7 +43,9 @@ const ShoppingCheckout = () => {
   }, []);
   useEffect(() => {
     async function getAddressList() {
-      const res = await getDetails("/api/address/");
+      const res = await getDetails(
+        "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/address/"
+      );
       setAddresses(res.list.address);
       if (!shippingAddress) {
         res.list.address.forEach((curr) => {
@@ -207,11 +213,14 @@ const ShoppingCheckout = () => {
         {/* Place Order Button */}
         <button
           onClick={async () => {
-            await postDetails("/api/orders", {
-              products: productInCart.list,
-              address: shippingAddress,
-              amount: calculateTotal().toFixed(2),
-            });
+            await postDetails(
+              "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/orders",
+              {
+                products: productInCart.list,
+                address: shippingAddress,
+                amount: calculateTotal().toFixed(2),
+              }
+            );
             dispatch(setStateOfDialogBox(true));
             dispatch(setDialogPage("Order Confromation"));
           }}

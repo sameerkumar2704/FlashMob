@@ -23,7 +23,9 @@ function ProductDetails() {
 
   useEffect(() => {
     asyncHandler(async () => {
-      const res = await getDetails(`/api/product?productId=${productId}`);
+      const res = await getDetails(
+        `http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/product?productId=${productId}`
+      );
       setProductDetails(res.details);
     }, toast)();
   }, [productId]);
@@ -35,7 +37,7 @@ function ProductDetails() {
     }
     asyncHandler(async () => {
       const res = await getDetails(
-        `/api/cart/productIsPresent?user=${currentUser?._id}&product_item=${productDetails._id}`
+        `http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8080/cart/productIsPresent?user=${currentUser?._id}&product_item=${productDetails._id}`
       );
       setPresentInCart(res.productInCart);
       if (res.productInCart) {
