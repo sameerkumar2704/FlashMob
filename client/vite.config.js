@@ -7,16 +7,16 @@ export default defineConfig({
     host: true,
     proxy: {
       "/api": {
-        target: "http://localhost:8080",
+        target: "https://flashmobback.onrender.com",
         changeOrigin: true,
-        rewrite: path => path.replace(/^\/api/, "")
-      }
-    }
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
   },
   plugins: [react()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src")
-    }
-  }
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
 });
