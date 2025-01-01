@@ -15,7 +15,7 @@ const RecentOrders = () => {
   useEffect(() => {
     async function getOrderList() {
       const res = await getDetails(
-        "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/orders/?limit=3"
+        "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/orders/?limit=3"
       );
       setOrders(res.orders);
     }
@@ -100,7 +100,7 @@ const UserAddress = () => {
   const [addresses, setAddresses] = useState(undefined);
   const handleSubmit = asyncHandler(async (e) => {
     e.preventDefault();
-    const res = await postDetails("https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/", formData);
+    const res = await postDetails("https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/address/", formData);
     if (res.status === 304) {
       throw new Error("No Update in Address");
     }
@@ -117,7 +117,7 @@ const UserAddress = () => {
 
   const handleDelete = (id) => {
     setAddresses(addresses.filter((addr) => addr._id !== id));
-    deleteItem(`https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/${id}`);
+    deleteItem(`https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/address/${id}`);
   };
 
   const resetForm = () => {
@@ -135,7 +135,7 @@ const UserAddress = () => {
   };
 
   const setDefaultAddress = async (formData) => {
-    const res = await postDetails("https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/", formData);
+    const res = await postDetails("https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/address/", formData);
     if (res.status === 304) {
       throw new Error("No Update in Address");
     }
@@ -143,7 +143,7 @@ const UserAddress = () => {
   };
   useEffect(() => {
     async function getAddressList() {
-      const res = await getDetails("https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/");
+      const res = await getDetails("https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/address/");
       if (res.list == null) {
         setAddresses([]);
       } else {
@@ -352,7 +352,7 @@ const ProfilePage = () => {
   useEffect(() => {
     async function getAboutUser() {
       const res = await getDetails(
-        "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/users/"
+        "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/users/"
       );
       setDetails(res.detail);
     }

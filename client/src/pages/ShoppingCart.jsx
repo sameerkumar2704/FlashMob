@@ -9,7 +9,7 @@ const ShoppingCart = () => {
   useEffect(() => {
     async function getCartProducts() {
       const res = await getDetails(
-        "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/cart/all"
+        "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/cart/all"
       );
       setProducts(res.list);
     }
@@ -29,7 +29,7 @@ const ShoppingCart = () => {
       })
     );
     await postDetails(
-      "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/cart/add",
+      "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/cart/add",
       {
         product_item: id,
 
@@ -40,7 +40,7 @@ const ShoppingCart = () => {
 
   const removeProduct = async (id) => {
     await deleteItem(
-      `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/cart?productId=${id}`
+      `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/cart?productId=${id}`
     );
     setProducts(products.filter((product) => product._id !== id));
   };

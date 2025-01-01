@@ -80,7 +80,7 @@ export function NavDrawer() {
             <button
               onClick={async () => {
                 await fetch(
-                  "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/users/logout"
+                  "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/users/logout"
                 );
                 dispatch(currentUserInstance(undefined));
                 dispatch(setDialogPage("registration"));

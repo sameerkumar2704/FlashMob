@@ -136,14 +136,14 @@ const RegistaionForm = () => {
           try {
             // Send registration details
             const result = await postDetails(
-              "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/users/register",
+              "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/users/register",
               obj
             );
             if (result.status === "failed") throw new Error(result.message);
 
             // Attempt login after registration
             const userDetail = await postDetails(
-              "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/users/login",
+              "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/users/login",
               obj
             );
             if (userDetail.status === "failed")
@@ -216,7 +216,7 @@ const LoginInForm = () => {
           };
 
           let userDetail = await postDetails(
-            "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/users/login",
+            "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/users/login",
             obj
           );
           if (userDetail.status === "failed")
@@ -268,7 +268,7 @@ const AddNewAddress = () => {
         e.preventDefault();
         console.log("clicked");
         const resp = await postDetails(
-          "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/address/add",
+          "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/address/add",
           {
             houseNo: houeNo.current.value,
             zipcode: zipcode.current.value,
@@ -355,7 +355,7 @@ const ForgotPassword = () => {
             };
 
             const result = await postDetails(
-              "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/users/forgotPassword",
+              "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/users/forgotPassword",
               obj
             );
             if (result.status === "failed") throw new Error(result.message);
@@ -434,7 +434,7 @@ const ResetPassword = () => {
             }
 
             const result = await patchDetails(
-              `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/users/resetPassword/${resetToken
+              `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/users/resetPassword/${resetToken
                 .current.value}`,
               {
                 password: password.current.value

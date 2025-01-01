@@ -24,7 +24,7 @@ function ProductDetails() {
   useEffect(() => {
     asyncHandler(async () => {
       const res = await getDetails(
-        `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/product?productId=${productId}`
+        `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/product?productId=${productId}`
       )
       setProductDetails(res.details)
     }, toast)()
@@ -37,7 +37,7 @@ function ProductDetails() {
     }
     asyncHandler(async () => {
       const res = await getDetails(
-        `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/cart/productIsPresent?user=${currentUser?._id}&product_item=${productDetails._id}`
+        `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/cart/productIsPresent?user=${currentUser?._id}&product_item=${productDetails._id}`
       )
       setPresentInCart(res.productInCart)
       if (res.productInCart) {
@@ -53,7 +53,7 @@ function ProductDetails() {
     }
     try {
       setIsLoading(true)
-      await postDetails('https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/cart/add', {
+      await postDetails('https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/cart/add', {
         user: currentUser?._id,
         product_item: productDetails._id,
         increaseQuantity: quantity

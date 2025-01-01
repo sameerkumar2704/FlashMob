@@ -28,7 +28,7 @@ export function FilterProductPage() {
   useEffect(() => {
     async function getDataPageChange() {
       const data = await getDetails(
-        `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:5173/product/all?search=${listType.searchText}&&page=${currentPage}&&limit=16&&maxPrice=${filters.priceRange}`
+        `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/product/all?search=${listType.searchText}&&page=${currentPage}&&limit=16&&maxPrice=${filters.priceRange}`
       );
 
       setList(data);
