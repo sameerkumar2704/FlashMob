@@ -23,7 +23,7 @@ export function ViewAllPage() {
     async function getDataPageChange() {
       setLoading(true);
       const data = await getDetails(
-        `https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/product/${
+        `http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/product/${
           listType.type
         }?limit=16&&page=${currentPage}&&category=${searchParams.get(
           "category"

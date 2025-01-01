@@ -7,7 +7,7 @@ const OrderList = () => {
   useEffect(() => {
     async function getOrders() {
       const data = await getDetails(
-        "https://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/orders"
+        "http://ec2-16-171-29-86.eu-north-1.compute.amazonaws.com:8081/orders"
       );
       setOrders(data.orders);
     }
